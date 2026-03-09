@@ -9,6 +9,6 @@ pub struct SystemInfo {
 #[tauri::command]
 pub fn get_system_info() -> SystemInfo {
     SystemInfo {
-      os_name: System::name().unwrap_or("Unknown".to_string())
+      os_name: System::name().unwrap_or("Unknown".to_string()),
     }
 }

@@ -1,4 +1,5 @@
 use serde::Serialize;
+use sysinfo::{System};
 
 #[derive(Serialize)]
 pub struct MemoryInfo {
@@ -7,7 +8,10 @@ pub struct MemoryInfo {
 
 #[tauri::command]
 pub fn get_memory_info() -> MemoryInfo {
+    let mut sys = System::new();
+    sys.refresh_all();
+
     MemoryInfo {
-        total_memory: 0,
+        total_memory: sys.total_memory(),
     }
 }
