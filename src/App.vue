@@ -28,6 +28,13 @@ const formatMemory = (bytes: number) => {
   <h2 v-if="motherboardInfo">{{ motherboardInfo.manufacturer }}</h2>
   <h2 v-if="motherboardInfo">{{ motherboardInfo.product }}</h2>
   <h2 v-if="motherboardInfo">{{ motherboardInfo.version }}</h2>
+  <h2 v-if="motherboardInfo">{{ motherboardInfo.serial_number }}</h2>
+  <h2 v-if="motherboardInfo">{{ motherboardInfo.asset_tag }}</h2>
+  <h2 v-if="motherboardInfo">{{ motherboardInfo.bios.vendor }}</h2>
+  <h2 v-if="motherboardInfo">{{ motherboardInfo.bios.version }}</h2>
+  <h2 v-if="motherboardInfo">{{ motherboardInfo.bios.release_date }}</h2>
+  <h2 v-if="motherboardInfo">{{ motherboardInfo.memory_slots }}</h2>
+
   <h2 v-if="cpuInfo">
     {{ cpuInfo.name }} - {{ cpuInfo.cores }} cores - {{ cpuInfo.frequency }} MHz
   </h2>
