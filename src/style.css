@@ -1,1 +1,16 @@
+html,
+body,
+#app {
+  background: transparent;
+  color: white;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
 
+/* Fallback for Linux where window-vibrancy blur doesn't naturally apply
+body.linux-fallback,
+body.linux-fallback #app {
+  background: rgba(30, 30, 30, 0.95);
+}
+*/
