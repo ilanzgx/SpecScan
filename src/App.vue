@@ -1,240 +1,80 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { invoke } from "@tauri-apps/api/core";
-import type {
-  SystemInfo,
-  CpuInfo,
-  MemoryInfo,
-  MotherboardInfo,
-  DiskInfo,
-  PhysicalDiskInfo,
-  PhysicalMemorySlot,
-  GpuInfo,
-  NetworkInfo,
-  NetworkAdapterInfo,
-} from "./types/hardware";
+import { ref, computed } from "vue";
+import { useHardwareData } from "./composables/useHardwareData";
+import AppSidebar from "./components/layout/AppSidebar.vue";
+import SystemView from "./components/hardware/SystemView.vue";
+import CpuView from "./components/hardware/CpuView.vue";
+import GpuView from "./components/hardware/GpuView.vue";
+import MemoryView from "./components/hardware/MemoryView.vue";
+import DisksView from "./components/hardware/DisksView.vue";
+import MotherboardView from "./components/hardware/MotherboardView.vue";
+import NetworkView from "./components/hardware/NetworkView.vue";
 
-const systemInfo = ref<SystemInfo | null>(null);
-const cpuInfo = ref<CpuInfo | null>(null);
-const memoryInfo = ref<MemoryInfo | null>(null);
-const motherboardInfo = ref<MotherboardInfo | null>(null);
-const disksInfo = ref<DiskInfo[] | null>(null);
-const physicalDisksInfo = ref<PhysicalDiskInfo[] | null>(null);
-const physicalMemoryInfo = ref<PhysicalMemorySlot[] | null>(null);
-const gpuInfo = ref<GpuInfo[] | null>(null);
-const networkInfo = ref<NetworkInfo[] | null>(null);
-const networkAdaptersInfo = ref<NetworkAdapterInfo[] | null>(null);
+const {
+  isLoading,
+  systemInfo,
+  cpuInfo,
+  memoryInfo,
+  motherboardInfo,
+  disksInfo,
+  physicalDisksInfo,
+  physicalMemoryInfo,
+  gpuInfo,
+  networkInfo,
+  networkAdaptersInfo,
+  formatBytes,
+  formatUptime,
+} = useHardwareData();
 
-onMounted(async () => {
-  systemInfo.value = await invoke("get_system_info");
-  cpuInfo.value = await invoke("get_cpu_info");
-  memoryInfo.value = await invoke("get_memory_info");
-  motherboardInfo.value = await invoke("get_motherboard_info");
-  disksInfo.value = await invoke("get_disks_info");
-  physicalDisksInfo.value = await invoke("get_physical_disks_info");
-  physicalMemoryInfo.value = await invoke("get_physical_memory_info");
-  gpuInfo.value = await invoke("get_gpu_info");
-  networkInfo.value = await invoke("get_network_info");
-  networkAdaptersInfo.value = await invoke("get_network_adapters_info");
-});
+const activeTab = ref("system");
 
-const formatMemory = (bytes: number) => {
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-  if (bytes === 0) return "n/a";
-  const i = parseInt(String(Math.floor(Math.log(bytes) / Math.log(1024))));
-  return Math.round(bytes / Math.pow(1024, i)) + " " + sizes[i];
-};
+const uptime = computed(() =>
+  systemInfo.value ? formatUptime(systemInfo.value.uptime_seconds) : "—",
+);
 </script>
 
 <template>
-  <h1>SpecScan</h1>
-  <div class="flex flex-col gap-4">
-    <!-- so -->
-    <div>
-      <h2 class="text-2xl">Sistema Operacional</h2>
-      <h4 v-if="systemInfo">
-        {{ systemInfo.os_name }} {{ systemInfo.os_version }}
-      </h4>
-      <h4 v-if="systemInfo">Kernel Version {{ systemInfo.kernel_version }}</h4>
-      <h4 v-if="systemInfo">{{ systemInfo.host_name }}</h4>
-      <h4 v-if="systemInfo">{{ systemInfo.cpu_arch }}</h4>
-      <h4 v-if="systemInfo">PC ligado a: {{ systemInfo.uptime_seconds }}s</h4>
-      <h4 v-if="systemInfo">{{ systemInfo.boot_time_seconds }}</h4>
-    </div>
+  <div class="app-shell">
+    <AppSidebar v-model:activeTab="activeTab" />
 
-    <!-- cpu -->
-    <div>
-      <h2 class="text-2xl">CPU</h2>
-      <h4 v-if="cpuInfo">
-        {{ cpuInfo.name }} - {{ cpuInfo.cores }} cores -
-        {{ cpuInfo.frequency }} MHz
-      </h4>
-    </div>
-
-    <!-- gpu -->
-    <div>
-      <h2 class="text-2xl">GPU / Vídeo</h2>
-      <div v-if="gpuInfo && gpuInfo.length > 0">
-        <div v-for="gpu in gpuInfo" :key="gpu.name" class="gap-2 mb-2">
-          <h4>{{ gpu.name }} ({{ gpu.manufacturer }})</h4>
-          <h4>
-            Processador: {{ gpu.video_processor }} | VRAM:
-            {{ gpu.adapter_ram_gb }} GB | DAC: {{ gpu.adapter_dac_type }}
-          </h4>
-          <h4>Driver: {{ gpu.driver_version }} ({{ gpu.driver_date }})</h4>
-          <h4>
-            {{ gpu.video_mode_description }} @ {{ gpu.refresh_rate }}Hz ({{
-              gpu.min_refresh_rate
-            }}-{{ gpu.max_refresh_rate }}Hz) | {{ gpu.bits_per_pixel }}bpp
-          </h4>
-        </div>
-      </div>
-      <h4 v-else-if="gpuInfo">Nenhuma GPU encontrada.</h4>
-    </div>
-
-    <!-- memory -->
-    <div>
-      <h2 class="text-2xl">Memória RAM</h2>
-
-      <div v-if="memoryInfo" class="mb-4">
-        <h3 class="text-lg font-bold">Uso Geral:</h3>
-        <h4>Total: {{ formatMemory(memoryInfo.total_memory) }}</h4>
-        <h4>Usado: {{ formatMemory(memoryInfo.used_memory) }}</h4>
-        <h4>Livre: {{ formatMemory(memoryInfo.free_memory) }}</h4>
+    <main class="app-content">
+      <!-- Loading state -->
+      <div v-if="isLoading" class="loading-screen">
+        <span class="loading-spinner" />
+        <p class="loading-text">Lendo hardware…</p>
       </div>
 
-      <div v-if="physicalMemoryInfo && physicalMemoryInfo.length > 0">
-        <h3 class="text-lg font-bold">Pentes Físicos:</h3>
-        <div
-          v-for="ram in physicalMemoryInfo"
-          :key="ram.part_number"
-          class="gap-2 mb-1"
-        >
-          <h4>
-            {{ ram.capacity_gb }}GB {{ ram.manufacturer }}
-            {{ ram.memory_type }} @ {{ ram.speed_mhz }}MHz
-            {{ ram.form_factor }} | P/N: {{ ram.part_number }} |
-            {{ ram.configured_voltage }}V
-          </h4>
-        </div>
-      </div>
-    </div>
-
-    <!-- disks -->
-    <div>
-      <h2 class="text-2xl">Discos</h2>
-
-      <!-- Hardware -->
-      <div
-        v-if="physicalDisksInfo && physicalDisksInfo.length > 0"
-        class="mb-4"
-      >
-        <h3 class="text-lg font-bold">Drives Físicos:</h3>
-        <div
-          v-for="disk in physicalDisksInfo"
-          :key="disk.serial_number"
-          class="gap-2 mb-1"
-        >
-          <h4>
-            {{ disk.model }} - {{ disk.size_gb }} GB (S/N:
-            {{ disk.serial_number }})
-          </h4>
-        </div>
-      </div>
-
-      <!-- Partições -->
-      <div v-if="disksInfo && disksInfo.length > 0">
-        <h3 class="text-lg font-bold">Volumes Lógicos:</h3>
-        <div v-for="disk in disksInfo" :key="disk.name" class="gap-2 mb-2">
-          <h4>
-            {{ disk.name }} ({{ disk.mount_point }}) [{{ disk.kind }} -
-            {{ disk.file_system }}]
-            <span v-if="disk.is_removable">(Removível)</span>
-          </h4>
-          <h4>
-            {{ disk.usage_percent }}% em uso ({{ disk.used_gb }} GB usados de
-            {{ disk.total_gb }} GB) - Livre: {{ disk.available_gb }} GB
-          </h4>
-        </div>
-      </div>
-    </div>
-
-    <!-- motherboard -->
-    <div v-if="motherboardInfo">
-      <h2 class="text-2xl">Placa Mãe</h2>
-      <div>
-        <h4>{{ motherboardInfo.manufacturer }}</h4>
-        <h4>{{ motherboardInfo.product }}</h4>
-        <h4>{{ motherboardInfo.version }}</h4>
-      </div>
-      <div>
-        <h4>
-          S/N: {{ motherboardInfo.serial_number }} | Asset:
-          {{ motherboardInfo.asset_tag }} | BIOS:
-          {{ motherboardInfo.bios.vendor }} (v{{
-            motherboardInfo.bios.version
-          }}
-          - {{ motherboardInfo.bios.release_date }})
-        </h4>
-      </div>
-
-      <div
-        class="gap-2"
-        v-for="memorySlot in motherboardInfo.memory_slots"
-        :key="memorySlot.slot_label"
-      >
-        <h1 class="text-lg">Slot {{ memorySlot.slot_label }}</h1>
-        <div class="">
-          <h4>
-            {{ memorySlot.bank_label }}: {{ memorySlot.size_mb }}MB
-            {{ memorySlot.manufacturer }} {{ memorySlot.memory_type }} @
-            {{ memorySlot.speed_mhz }}MHz {{ memorySlot.form_factor }} | P/N:
-            {{ memorySlot.part_number }} | S/N: {{ memorySlot.serial_number }} |
-            {{ memorySlot.configured_voltage }}
-          </h4>
-        </div>
-      </div>
-    </div>
-    <div v-else>
-      <h2>Placa Mãe</h2>
-      <h4>Carregando...</h4>
-    </div>
-
-    <!-- network -->
-    <div>
-      <h2 class="text-2xl">Rede</h2>
-      <div
-        v-if="networkAdaptersInfo && networkAdaptersInfo.length > 0"
-        class="mb-4"
-      >
-        <h3 class="text-lg font-bold">Adaptadores Físicos:</h3>
-        <div
-          v-for="adapter in networkAdaptersInfo"
-          :key="adapter.mac_address"
-          class="gap-2 mb-1"
-        >
-          <h4>
-            {{ adapter.name }} ({{ adapter.manufacturer }}) |
-            {{ adapter.adapter_type }} | {{ adapter.speed_mbps }} Mbps | MAC:
-            {{ adapter.mac_address }} | {{ adapter.connection_id }}
-          </h4>
-        </div>
-      </div>
-
-      <div v-if="networkInfo && networkInfo.length > 0">
-        <h3 class="text-lg font-bold">Interfaces Ativas:</h3>
-        <div
-          v-for="net in networkInfo"
-          :key="net.interface_name"
-          class="gap-2 mb-1"
-        >
-          <h4>
-            {{ net.interface_name }} | MAC: {{ net.mac_address }} | ⬇
-            {{ formatMemory(net.received_bytes) }} | ⬆
-            {{ formatMemory(net.transmitted_bytes) }}
-          </h4>
-        </div>
-      </div>
-    </div>
+      <!-- Views -->
+      <template v-else>
+        <SystemView
+          v-if="activeTab === 'system'"
+          :system="systemInfo"
+          :uptime="uptime"
+        />
+        <CpuView v-else-if="activeTab === 'cpu'" :cpu="cpuInfo" />
+        <GpuView v-else-if="activeTab === 'gpu'" :gpus="gpuInfo" />
+        <MemoryView
+          v-else-if="activeTab === 'memory'"
+          :memory="memoryInfo"
+          :slots="physicalMemoryInfo"
+          :formatBytes="formatBytes"
+        />
+        <DisksView
+          v-else-if="activeTab === 'disks'"
+          :disks="disksInfo"
+          :physicalDisks="physicalDisksInfo"
+        />
+        <MotherboardView
+          v-else-if="activeTab === 'motherboard'"
+          :motherboard="motherboardInfo"
+        />
+        <NetworkView
+          v-else-if="activeTab === 'network'"
+          :adapters="networkAdaptersInfo"
+          :interfaces="networkInfo"
+          :formatBytes="formatBytes"
+        />
+      </template>
+    </main>
   </div>
 </template>

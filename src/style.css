@@ -1,18 +1,124 @@
 @import "tailwindcss";
 
+/* ─── Google Fonts ──────────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* ─── Design Tokens ─────────────────────────────────────────────── */
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Fundo (aproveitando o vibrancy nativo) */
+  --bg-app: transparent;
+  --bg-sidebar: rgba(10, 10, 14, 0.55);
+  --bg-content: rgba(14, 14, 20, 0.35);
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.07);
+
+  /* Bordas */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-card: rgba(255, 255, 255, 0.1);
+
+  /* Texto */
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.45);
+  --text-label: rgba(255, 255, 255, 0.38);
+
+  /* Cores de acento por categoria */
+  --accent-system-color: #a78bfa; /* violeta */
+  --accent-cpu-color: #60a5fa; /* azul */
+  --accent-gpu-color: #34d399; /* esmeralda */
+  --accent-memory-color: #fb923c; /* laranja */
+  --accent-disk-color: #facc15; /* âmbar */
+  --accent-mobo-color: #f472b6; /* rosa */
+  --accent-network-color: #22d3ee; /* ciano */
+
+  /* Tamanhos */
+  --sidebar-w: 200px;
+  --radius-card: 14px;
+  --radius-btn: 8px;
+}
+
+/* ─── Reset ─────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 html,
 body,
 #app {
-  background: transparent;
-  color: white;
-  margin: 0;
-  padding: 0;
   height: 100vh;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Fallback for Linux where window-vibrancy blur doesn't naturally apply
-body.linux-fallback,
-body.linux-fallback #app {
-  background: rgba(30, 30, 30, 0.95);
+/* ─── App Shell ──────────────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
 }
-*/
+
+/* ─── App Content ────────────────────────────────────────────────── */
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--bg-content);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.app-content::-webkit-scrollbar {
+  width: 5px;
+}
+.app-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+
+/* ─── Loading Screen ─────────────────────────────────────────────── */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+}
+
+.loading-spinner {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-cpu-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 13px;
+  color: var(--text-label);
+}
+
+/* ─── Misc ───────────────────────────────────────────────────────── */
+.view-empty {
+  font-size: 13px;
+  color: var(--text-label);
+  padding: 8px 0;
+  text-align: center;
+}
