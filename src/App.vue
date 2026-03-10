@@ -9,6 +9,9 @@ import type {
   DiskInfo,
   PhysicalDiskInfo,
   PhysicalMemorySlot,
+  GpuInfo,
+  NetworkInfo,
+  NetworkAdapterInfo,
 } from "./types/hardware";
 
 const systemInfo = ref<SystemInfo | null>(null);
@@ -18,6 +21,9 @@ const motherboardInfo = ref<MotherboardInfo | null>(null);
 const disksInfo = ref<DiskInfo[] | null>(null);
 const physicalDisksInfo = ref<PhysicalDiskInfo[] | null>(null);
 const physicalMemoryInfo = ref<PhysicalMemorySlot[] | null>(null);
+const gpuInfo = ref<GpuInfo[] | null>(null);
+const networkInfo = ref<NetworkInfo[] | null>(null);
+const networkAdaptersInfo = ref<NetworkAdapterInfo[] | null>(null);
 
 onMounted(async () => {
   systemInfo.value = await invoke("get_system_info");
@@ -27,6 +33,9 @@ onMounted(async () => {
   disksInfo.value = await invoke("get_disks_info");
   physicalDisksInfo.value = await invoke("get_physical_disks_info");
   physicalMemoryInfo.value = await invoke("get_physical_memory_info");
+  gpuInfo.value = await invoke("get_gpu_info");
+  networkInfo.value = await invoke("get_network_info");
+  networkAdaptersInfo.value = await invoke("get_network_adapters_info");
 });
 
 const formatMemory = (bytes: number) => {
@@ -60,6 +69,27 @@ const formatMemory = (bytes: number) => {
         {{ cpuInfo.name }} - {{ cpuInfo.cores }} cores -
         {{ cpuInfo.frequency }} MHz
       </h4>
+    </div>
+
+    <!-- gpu -->
+    <div>
+      <h2 class="text-2xl">GPU / Vídeo</h2>
+      <div v-if="gpuInfo && gpuInfo.length > 0">
+        <div v-for="gpu in gpuInfo" :key="gpu.name" class="gap-2 mb-2">
+          <h4>{{ gpu.name }} ({{ gpu.manufacturer }})</h4>
+          <h4>
+            Processador: {{ gpu.video_processor }} | VRAM:
+            {{ gpu.adapter_ram_gb }} GB | DAC: {{ gpu.adapter_dac_type }}
+          </h4>
+          <h4>Driver: {{ gpu.driver_version }} ({{ gpu.driver_date }})</h4>
+          <h4>
+            {{ gpu.video_mode_description }} @ {{ gpu.refresh_rate }}Hz ({{
+              gpu.min_refresh_rate
+            }}-{{ gpu.max_refresh_rate }}Hz) | {{ gpu.bits_per_pixel }}bpp
+          </h4>
+        </div>
+      </div>
+      <h4 v-else-if="gpuInfo">Nenhuma GPU encontrada.</h4>
     </div>
 
     <!-- memory -->
@@ -168,6 +198,43 @@ const formatMemory = (bytes: number) => {
     <div v-else>
       <h2>Placa Mãe</h2>
       <h4>Carregando...</h4>
+    </div>
+
+    <!-- network -->
+    <div>
+      <h2 class="text-2xl">Rede</h2>
+      <div
+        v-if="networkAdaptersInfo && networkAdaptersInfo.length > 0"
+        class="mb-4"
+      >
+        <h3 class="text-lg font-bold">Adaptadores Físicos:</h3>
+        <div
+          v-for="adapter in networkAdaptersInfo"
+          :key="adapter.mac_address"
+          class="gap-2 mb-1"
+        >
+          <h4>
+            {{ adapter.name }} ({{ adapter.manufacturer }}) |
+            {{ adapter.adapter_type }} | {{ adapter.speed_mbps }} Mbps | MAC:
+            {{ adapter.mac_address }} | {{ adapter.connection_id }}
+          </h4>
+        </div>
+      </div>
+
+      <div v-if="networkInfo && networkInfo.length > 0">
+        <h3 class="text-lg font-bold">Interfaces Ativas:</h3>
+        <div
+          v-for="net in networkInfo"
+          :key="net.interface_name"
+          class="gap-2 mb-1"
+        >
+          <h4>
+            {{ net.interface_name }} | MAC: {{ net.mac_address }} | ⬇
+            {{ formatMemory(net.received_bytes) }} | ⬆
+            {{ formatMemory(net.transmitted_bytes) }}
+          </h4>
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -4,3 +4,4 @@ pub mod memory;
 pub mod disks;
 pub mod network;
 pub mod system;
+pub mod gpu;

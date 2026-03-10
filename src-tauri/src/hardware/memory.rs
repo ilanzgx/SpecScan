@@ -38,7 +38,7 @@ pub fn get_physical_memory_info() -> Vec<PhysicalMemorySlot> {
         use std::process::Command;
 
         let output = Command::new("powershell")
-            .args(&[
+            .args([
                 "-NoProfile",
                 "-Command",
                 r#"Get-CimInstance Win32_PhysicalMemory | Select-Object Manufacturer,PartNumber,Capacity,Speed,ConfiguredVoltage,SMBIOSMemoryType,FormFactor | ConvertTo-Json -Compress"#

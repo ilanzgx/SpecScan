@@ -20,7 +20,7 @@ pub fn get_cpu_info() -> CpuInfo {
         .unwrap_or("Unknown CPU".into());
 
     CpuInfo {
-        name: name,
+        name,
         cores: sys.cpus().len() as u32,
         frequency: sys.cpus().first().map(|cpu| cpu.frequency()).unwrap_or(0),
     }

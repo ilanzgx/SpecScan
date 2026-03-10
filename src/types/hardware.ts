@@ -76,3 +76,35 @@ export interface PhysicalMemorySlot {
   memory_type: string;
   form_factor: string;
 }
+
+export interface GpuInfo {
+  name: string;
+  manufacturer: string;
+  video_processor: string;
+  driver_version: string;
+  driver_date: string;
+  adapter_ram_gb: number;
+  adapter_dac_type: string;
+  resolution: string;
+  bits_per_pixel: number;
+  refresh_rate: number;
+  max_refresh_rate: number;
+  min_refresh_rate: number;
+  video_mode_description: string;
+}
+
+export interface NetworkInfo {
+  interface_name: string;
+  received_bytes: number;
+  transmitted_bytes: number;
+  mac_address: string;
+}
+
+export interface NetworkAdapterInfo {
+  name: string;
+  manufacturer: string;
+  mac_address: string;
+  speed_mbps: number;
+  connection_id: string;
+  adapter_type: string;
+}

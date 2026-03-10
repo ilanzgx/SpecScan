@@ -7,15 +7,18 @@ pub fn run() {
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![
       hardware::cpu::get_cpu_info,
+      hardware::gpu::get_gpu_info,
       hardware::motherboard::get_motherboard_info,
       hardware::memory::get_memory_info,
       hardware::memory::get_physical_memory_info,
       hardware::disks::get_disks_info,
       hardware::disks::get_physical_disks_info,
       hardware::network::get_network_info,
+      hardware::network::get_network_adapters_info,
       hardware::system::get_system_info,
     ])
     .setup(|app| {
+      #[allow(unused_variables)]
       let window = app.get_webview_window("main").unwrap();
 
       #[cfg(target_os = "macos")]

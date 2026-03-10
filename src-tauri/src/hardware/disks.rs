@@ -56,7 +56,6 @@ pub struct PhysicalDiskInfo {
     pub size_gb: f64,
 }
 
-#[cfg(target_os = "windows")]
 #[tauri::command]
 pub fn get_physical_disks_info() -> Vec<PhysicalDiskInfo> {
     #[cfg(target_os = "windows")]
@@ -64,7 +63,7 @@ pub fn get_physical_disks_info() -> Vec<PhysicalDiskInfo> {
         use std::process::Command;
 
         let output = Command::new("powershell")
-            .args(&[
+            .args([
                 "-NoProfile",
                 "-Command",
                 r#"Get-CimInstance Win32_DiskDrive | Select-Object Model,SerialNumber,Size | ConvertTo-Json -Compress"#
