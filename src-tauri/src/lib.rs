@@ -9,7 +9,9 @@ pub fn run() {
       hardware::cpu::get_cpu_info,
       hardware::motherboard::get_motherboard_info,
       hardware::memory::get_memory_info,
+      hardware::memory::get_physical_memory_info,
       hardware::disks::get_disks_info,
+      hardware::disks::get_physical_disks_info,
       hardware::network::get_network_info,
       hardware::system::get_system_info,
     ])
@@ -21,7 +23,7 @@ pub fn run() {
         .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
       #[cfg(target_os = "windows")]
-      window_vibrancy::apply_blur(&window, Some((18, 18, 18, 125)))
+      window_vibrancy::apply_blur(&window, Some((18, 18, 18, 150)))
         .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
 
 

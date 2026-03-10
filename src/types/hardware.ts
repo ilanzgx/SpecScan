@@ -1,5 +1,11 @@
 export interface SystemInfo {
   os_name: string;
+  os_version: string;
+  kernel_version: string;
+  host_name: string;
+  cpu_arch: string;
+  uptime_seconds: number;
+  boot_time_seconds: number;
 }
 
 export interface CpuInfo {
@@ -10,6 +16,8 @@ export interface CpuInfo {
 
 export interface MemoryInfo {
   total_memory: number;
+  used_memory: number;
+  free_memory: number;
 }
 
 export interface BiosInfo {
@@ -39,4 +47,32 @@ export interface MotherboardInfo {
   asset_tag: string;
   bios: BiosInfo;
   memory_slots: MemorySlot[];
+}
+
+export interface DiskInfo {
+  name: string;
+  mount_point: string;
+  kind: string;
+  file_system: string;
+  total_gb: number;
+  used_gb: number;
+  available_gb: number;
+  usage_percent: number;
+  is_removable: boolean;
+}
+
+export interface PhysicalDiskInfo {
+  model: string;
+  serial_number: string;
+  size_gb: number;
+}
+
+export interface PhysicalMemorySlot {
+  manufacturer: string;
+  part_number: string;
+  capacity_gb: number;
+  speed_mhz: number;
+  configured_voltage: number;
+  memory_type: string;
+  form_factor: string;
 }
