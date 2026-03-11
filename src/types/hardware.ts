@@ -16,7 +16,6 @@ export interface CpuInfo {
   logical_cores: number;
   base_frequency_mhz: number;
   max_frequency_mhz: number;
-  current_frequency_mhz: number;
   cache_l1_kb: number;
   cache_l2_kb: number;
   cache_l3_kb: number;

@@ -60,7 +60,9 @@ const tabs = [
     </nav>
 
     <!-- Footer -->
-    <div class="pt-4 border-t border-white/10 mt-4">
+    <div
+      class="flex items-center justify-center pt-4 border-t border-white/10 mt-4"
+    >
       <span class="text-[12px] font-medium text-white/30 px-2 tracking-wide"
         >v0.1.0</span
       >

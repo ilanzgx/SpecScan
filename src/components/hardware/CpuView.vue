@@ -15,7 +15,7 @@ onMounted(() => {
   <div class="p-4">
     <h2 class="text-2xl font-bold mb-4">Processador (CPU)</h2>
     <div v-if="cpu" class="space-y-4">
-      <div class="bg-gray-800/50 p-4 rounded-lg">
+      <div class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl">
         <h3 class="text-xl font-semibold mb-2">{{ cpu.brand }}</h3>
         <p class="text-sm text-gray-400 mb-4">Fabricante: {{ cpu.vendor }}</p>
 
@@ -76,8 +76,10 @@ onMounted(() => {
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-gray-800/50 p-4 rounded-lg">
-          <h3 class="font-semibold text-lg mb-2 border-b border-gray-700 pb-2">
+        <div class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl">
+          <h3
+            class="font-semibold text-lg mb-2 border-b border-gray-800/35 pb-2"
+          >
             Cache
           </h3>
           <ul class="space-y-1">
@@ -100,8 +102,10 @@ onMounted(() => {
           </ul>
         </div>
 
-        <div class="bg-gray-800/50 p-4 rounded-lg">
-          <h3 class="font-semibold text-lg mb-2 border-b border-gray-700 pb-2">
+        <div class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl">
+          <h3
+            class="font-semibold text-lg mb-2 border-b border-gray-800/35 pb-2"
+          >
             Detalhes da Arquitetura
           </h3>
           <p class="text-sm mb-2">{{ cpu.family }}</p>
@@ -120,8 +124,10 @@ onMounted(() => {
       <!-- New sections below -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Virtualização & Segurança -->
-        <div class="bg-gray-800/50 p-4 rounded-lg">
-          <h3 class="font-semibold text-lg mb-2 border-b border-gray-700 pb-2">
+        <div class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl">
+          <h3
+            class="font-semibold text-lg mb-2 border-b border-gray-800/35 pb-2"
+          >
             Topologia, Virtualização e Segurança
           </h3>
           <ul class="space-y-1 text-sm text-gray-300">
@@ -167,8 +173,10 @@ onMounted(() => {
         </div>
 
         <!-- Thermal & Energia -->
-        <div class="bg-gray-800/50 p-4 rounded-lg">
-          <h3 class="font-semibold text-lg mb-2 border-b border-gray-700 pb-2">
+        <div class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl">
+          <h3
+            class="font-semibold text-lg mb-2 border-b border-gray-800/35 pb-2"
+          >
             Power Management & Performance Monitoring
           </h3>
           <ul class="space-y-1 text-sm text-gray-300">
