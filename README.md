@@ -1,5 +1,33 @@
-# Vue 3 + TypeScript + Vite
+# SpecScan
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+A beautiful, elegant and lightweight desktop application to view detailed hardware information.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+Built with **Tauri**, **Rust**, **Vue 3**, **TypeScript**, and **TailwindCSS**.
+
+## 🚀 Getting Started
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Run in development mode:
+
+```bash
+npm run tauri dev
+```
+
+## ✨ Features
+
+- **Deep CPU Info**: Extracts architecture, cache, thermal and virtualization data directly from the CPUID registers.
+- **Memory & Slots**: Identifies capacity, speeds, and populated DIMM slots.
+- **GPU & Storage**: Scans available graphics cards and physical disk drives.
+- **Glassmorphism UI**: A gorgeous translucent dark-mode dashboard.
+
+## 🛠️ Stack
+
+- [Tauri](https://tauri.app/) (Backend / Engine)
+- [Rust](https://www.rust-lang.org/) (Hardware calls via `raw-cpuid` and `sysinfo`)
+- [Vue 3](https://vuejs.org/) + [Vite](https://vitejs.dev/) (Frontend)
+- [Tailwind CSS](https://tailwindcss.com/) (Styling)
