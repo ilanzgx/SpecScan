@@ -51,15 +51,19 @@ const formattedMemory = computed(() => {
     totalSum += slot.capacity_gb * 1024 * 1024 * 1024;
   }
 
-  return `${props.formatBytes(totalSum)} (${props.formatBytes(props.memory?.total_memory as number)} usável) (${slotCount}x${stickSizeGB}GB ${stickType} ${stickSpeed > 0 ? stickSpeed + "MHz" : ""})`.trim();
+  return `${props.formatBytes(totalSum)} (${props.formatBytes(props.memory?.total_memory as number)} utilizável) (${slotCount}x${stickSizeGB}GB ${stickType} ${stickSpeed > 0 ? stickSpeed + "MHz" : ""})`.trim();
 });
 </script>
 
 <template>
-  <div class="p-4">
-    <div class="mt-4">
-      <h2 class="text-2xl font-bold mb-4">Resumo da configuração</h2>
-      <ul>
+  <div class="p-4 flex items-center justify-center min-h-full py-12">
+    <div
+      class="bg-white/5 backdrop-blur-xl shadow-2xl p-8 rounded-xl w-full max-w-2xl"
+    >
+      <h2 class="text-2xl font-bold mb-6 border-b border-gray-800/35 pb-3">
+        Resumo da configuração
+      </h2>
+      <ul class="space-y-4">
         <!-- os -->
         <li>
           <strong>Sistema:</strong>
