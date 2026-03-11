@@ -22,8 +22,12 @@ pub fn get_gpu_info() -> Vec<GpuInfo> {
     #[cfg(target_os = "windows")]
     {
         use std::process::Command;
+        use std::os::windows::process::CommandExt;
+
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
 
         let output = Command::new("powershell")
+            .creation_flags(CREATE_NO_WINDOW)
             .args([
                 "-NoProfile",
                 "-Command",

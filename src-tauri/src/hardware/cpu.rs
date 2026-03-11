@@ -157,27 +157,37 @@ pub fn get_cpu_info() -> CpuInfo {
         has_pln = tpi.has_pln();
     }
 
+    #[allow(unused_mut)]
     let mut base_frequency_mhz = cpuid
         .get_processor_frequency_info()
         .map(|f| f.processor_base_frequency() as u64)
         .unwrap_or(0);
 
+    #[allow(unused_mut)]
     let mut max_frequency_mhz = cpuid
         .get_processor_frequency_info()
         .map(|f| f.processor_max_frequency() as u64)
         .unwrap_or(0);
 
+    #[allow(unused_mut)]
     let mut voltage_v = 0.0;
+    #[allow(unused_mut)]
     let mut socket_designation = "Unknown".to_string();
+    #[allow(unused_mut)]
     let mut current_clock_mhz = 0;
+    #[allow(unused_mut)]
     let mut is_throttling = false;
 
     #[cfg(target_os = "windows")]
     {
         use std::process::Command;
+        use std::os::windows::process::CommandExt;
+
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
 
         if let Ok(output) = Command::new("powershell")
-            .args(&[
+            .creation_flags(CREATE_NO_WINDOW)
+            .args([
                 "-NoProfile",
                 "-Command",
                 r#"Get-CimInstance Win32_Processor | Select-Object MaxClockSpeed,CurrentClockSpeed,CurrentVoltage,SocketDesignation | ConvertTo-Json -Compress"#
@@ -199,7 +209,7 @@ pub fn get_cpu_info() -> CpuInfo {
                     if let Some(vol) = value["CurrentVoltage"].as_u64() {
                         let mut v = vol as u16;
                         if v & 0x80 != 0 {
-                            v = v & 0x7F;
+                            v &= 0x7F;
                         }
                         voltage_v = (v as f64) / 10.0;
                     }

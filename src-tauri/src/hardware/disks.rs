@@ -61,8 +61,12 @@ pub fn get_physical_disks_info() -> Vec<PhysicalDiskInfo> {
     #[cfg(target_os = "windows")]
     {
         use std::process::Command;
+        use std::os::windows::process::CommandExt;
+
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
 
         let output = Command::new("powershell")
+            .creation_flags(CREATE_NO_WINDOW)
             .args([
                 "-NoProfile",
                 "-Command",

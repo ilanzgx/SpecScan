@@ -35,6 +35,8 @@ pub fn run() {
         let _ = window.eval("document.body.classList.add('linux-fallback');");
       }*/
 
+      app.handle().plugin(tauri_plugin_process::init())?;
+      app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
 
       if cfg!(debug_assertions) {
         app.handle().plugin(

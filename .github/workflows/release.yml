@@ -1,0 +1,240 @@
+name: "Release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+
+permissions:
+  contents: write
+
+jobs:
+  build-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            name: windows-x64
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install frontend dependencies
+        run: bun install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          args: --target ${{ matrix.target }}
+
+      - name: Debug - List bundle directory
+        shell: bash
+        run: |
+          echo "=== Listing src-tauri/target ==="
+          find src-tauri/target -type f \( -name "*.msi" -o -name "*.exe" -o -name "*.sig" \) 2>/dev/null || echo "No files found in src-tauri/target"
+          echo "=== Listing target ==="
+          find target -type f \( -name "*.msi" -o -name "*.exe" -o -name "*.sig" \) 2>/dev/null || echo "No files found in target"
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          mkdir -p renamed-artifacts
+
+          BUNDLE_PATH="src-tauri/target/${{ matrix.target }}/release/bundle"
+          if [ ! -d "$BUNDLE_PATH" ]; then
+            BUNDLE_PATH="target/${{ matrix.target }}/release/bundle"
+          fi
+
+          echo "Using bundle path: $BUNDLE_PATH"
+
+          find "$BUNDLE_PATH" -name "*.msi" -exec cp {} renamed-artifacts/SpecScan-${{ matrix.name }}.msi \; 2>/dev/null || true
+          find "$BUNDLE_PATH" -name "*-setup.exe" -exec cp {} renamed-artifacts/SpecScan-${{ matrix.name }}-setup.exe \; 2>/dev/null || true
+          find "$BUNDLE_PATH" -name "*.msi.sig" -exec cp {} renamed-artifacts/SpecScan-${{ matrix.name }}.msi.sig \; 2>/dev/null || true
+          find "$BUNDLE_PATH" -name "*-setup.exe.sig" -exec cp {} renamed-artifacts/SpecScan-${{ matrix.name }}-setup.exe.sig \; 2>/dev/null || true
+
+          echo "=== Renamed artifacts ==="
+          ls -la renamed-artifacts/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.name }}
+          path: renamed-artifacts/*
+          if-no-files-found: warn
+
+  release:
+    needs: build-tauri
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        run: |
+          TAG="$GITHUB_REF_NAME"
+          PREV_TAG=$(git tag --sort=-v:refname | grep -A1 "^${TAG}$" | tail -1)
+
+          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" = "$TAG" ]; then
+            RANGE="$TAG"
+          else
+            RANGE="${PREV_TAG}..${TAG}"
+          fi
+
+          echo "Generating changelog for range: $RANGE"
+
+          FEATURES=$(git log $RANGE --pretty=format:"%s" --no-merges | grep -iE "^feat(\(.*\))?:" | sed -E 's/^feat(\([^)]*\))?: //' || true)
+          FIXES=$(git log $RANGE --pretty=format:"%s" --no-merges | grep -iE "^fix(\(.*\))?:" | sed -E 's/^fix(\([^)]*\))?: //' || true)
+          REFACTORS=$(git log $RANGE --pretty=format:"%s" --no-merges | grep -iE "^refactor(\(.*\))?:" | sed -E 's/^refactor(\([^)]*\))?: //' || true)
+          STYLES=$(git log $RANGE --pretty=format:"%s" --no-merges | grep -iE "^style(\(.*\))?:" | sed -E 's/^style(\([^)]*\))?: //' || true)
+          PERFS=$(git log $RANGE --pretty=format:"%s" --no-merges | grep -iE "^perf(\(.*\))?:" | sed -E 's/^perf(\([^)]*\))?: //' || true)
+
+          > changelog.md
+
+          if [ -n "$FEATURES" ]; then
+            printf '### ✨ Features\n' >> changelog.md
+            echo "$FEATURES" | while IFS= read -r line; do
+              printf -- '- %s\n' "$line" >> changelog.md
+            done
+            printf '\n' >> changelog.md
+          fi
+
+          if [ -n "$FIXES" ]; then
+            printf '### 🐛 Bug Fixes\n' >> changelog.md
+            echo "$FIXES" | while IFS= read -r line; do
+              printf -- '- %s\n' "$line" >> changelog.md
+            done
+            printf '\n' >> changelog.md
+          fi
+
+          if [ -n "$REFACTORS" ]; then
+            printf '### ♻️ Refactors\n' >> changelog.md
+            echo "$REFACTORS" | while IFS= read -r line; do
+              printf -- '- %s\n' "$line" >> changelog.md
+            done
+            printf '\n' >> changelog.md
+          fi
+
+          if [ -n "$STYLES" ]; then
+            printf '### 🎨 Style\n' >> changelog.md
+            echo "$STYLES" | while IFS= read -r line; do
+              printf -- '- %s\n' "$line" >> changelog.md
+            done
+            printf '\n' >> changelog.md
+          fi
+
+          if [ -n "$PERFS" ]; then
+            printf '### ⚡️ Performance\n' >> changelog.md
+            echo "$PERFS" | while IFS= read -r line; do
+              printf -- '- %s\n' "$line" >> changelog.md
+            done
+            printf '\n' >> changelog.md
+          fi
+
+
+          if [ ! -s changelog.md ]; then
+            echo "Maintenance release." > changelog.md
+          fi
+
+          # append downloads table
+          TAG="$GITHUB_REF_NAME"
+          BASE="https://github.com/ilanzgx/SpecScan/releases/download/${TAG}"
+          printf '\n## \U0001F4E6 Downloads\n\n' >> changelog.md
+          printf '| Platform | Download |\n' >> changelog.md
+          printf '|----------|----------|\n' >> changelog.md
+          printf '| Windows (installer) | [`SpecScan-windows-x64-setup.exe`](%s/SpecScan-windows-x64-setup.exe) |\n' "$BASE" >> changelog.md
+          printf '| Windows (MSI) | [`SpecScan-windows-x64.msi`](%s/SpecScan-windows-x64.msi) |\n' "$BASE" >> changelog.md
+
+          echo "Generated changelog:"
+          cat changelog.md
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts
+        run: |
+          mkdir -p release-files
+          find artifacts -type f \( -name "*.msi" -o -name "*.exe" -o -name "*.sig" \) -exec cp {} release-files/ \; 2>/dev/null || true
+          echo "=== Release files ==="
+          ls -la release-files/
+
+      - name: Build updater manifest
+        working-directory: release-files
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+
+          const tag = process.env.TAG;
+          const version = tag.startsWith("v") ? tag.slice(1) : tag;
+          const baseUrl = `https://github.com/ilanzgx/SpecScan/releases/download/${tag}`;
+
+          const readSig = (file) => {
+            try {
+              return fs.readFileSync(file, "utf8").trim();
+            } catch (e) {
+              console.warn(`Warning: Could not read ${file}`);
+              return "";
+            }
+          };
+
+          const manifest = {
+            version,
+            notes: "Update to " + version,
+            pub_date: new Date().toISOString(),
+            platforms: {
+              "windows-x86_64": {
+                url: `${baseUrl}/SpecScan-windows-x64-setup.exe`,
+                signature: readSig("SpecScan-windows-x64-setup.exe.sig")
+              }
+            }
+          };
+
+          fs.writeFileSync("latest.json", JSON.stringify(manifest, null, 2) + "\n");
+          console.log("Generated latest.json:");
+          console.log(fs.readFileSync("latest.json", "utf8"));
+          NODE
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          name: SpecScan ${{ github.ref_name }}
+          body_path: changelog.md
+          files: release-files/*
