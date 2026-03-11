@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import IconSystem from "../icons/IconSystem.vue";
+import IconCpu from "../icons/IconCpu.vue";
+import IconGpu from "../icons/IconGpu.vue";
+import IconMemory from "../icons/IconMemory.vue";
+import IconDisk from "../icons/IconDisk.vue";
+import IconMotherboard from "../icons/IconMotherboard.vue";
+import IconNetwork from "../icons/IconNetwork.vue";
+
 const props = defineProps<{
   activeTab: string;
 }>();
@@ -8,13 +16,13 @@ const emit = defineEmits<{
 }>();
 
 const tabs = [
-  { id: "system", label: "Sistema", icon: "🖥️" },
-  { id: "cpu", label: "CPU", icon: "⚡" },
-  { id: "gpu", label: "GPU", icon: "🎮" },
-  { id: "memory", label: "Memória", icon: "🧠" },
-  { id: "disks", label: "Discos", icon: "💾" },
-  { id: "motherboard", label: "Placa-Mãe", icon: "🔌" },
-  { id: "network", label: "Rede", icon: "🌐" },
+  { id: "system", label: "Sistema", icon: IconSystem },
+  { id: "cpu", label: "CPU", icon: IconCpu },
+  { id: "gpu", label: "GPU", icon: IconGpu },
+  { id: "memory", label: "Memória", icon: IconMemory },
+  { id: "disks", label: "Discos", icon: IconDisk },
+  { id: "motherboard", label: "Placa-Mãe", icon: IconMotherboard },
+  { id: "network", label: "Rede", icon: IconNetwork },
 ] as const;
 </script>
 
@@ -24,7 +32,7 @@ const tabs = [
   >
     <!-- Header / Logo -->
     <div
-      class="flex items-center gap-3 px-2 pb-6 border-b border-white/10 mb-4 bg-red-500"
+      class="flex items-center gap-3 px-2 pb-6 border-b border-white/10 mb-4"
     >
       <h1 class="text-[17px] font-bold tracking-tight text-white/90">
         SpecScan
@@ -44,11 +52,11 @@ const tabs = [
         "
         @click="emit('update:activeTab', tab.id)"
       >
-        <span
-          class="text-[20px] leading-none opacity-80 group-hover:opacity-100 transition-opacity"
+        <component
+          :is="tab.icon"
+          class="w-5 h-5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
           :class="activeTab === tab.id ? 'opacity-100' : ''"
-          >{{ tab.icon }}</span
-        >
+        />
         <span class="flex-1">{{ tab.label }}</span>
       </button>
     </nav>

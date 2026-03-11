@@ -1,0 +1,64 @@
+<template>
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      class="mem"
+      d="M21.55,11.05a1,1,0,0,0,.95.95v6.68H1.5V12a1,1,0,0,0,0-1.91V5.32h21v4.77A1,1,0,0,0,21.55,11.05Z"
+    />
+    <rect fill="currentColor" x="6.27" y="9.14" width="5.73" height="3.82" />
+    <rect fill="currentColor" x="12" y="9.14" width="5.73" height="3.82" />
+    <line
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="1.91"
+      x1="4.36"
+      y1="15.82"
+      x2="4.36"
+      y2="18.68"
+    />
+    <line
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="1.91"
+      x1="8.18"
+      y1="15.82"
+      x2="8.18"
+      y2="18.68"
+    />
+    <line
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="1.91"
+      x1="12"
+      y1="15.82"
+      x2="12"
+      y2="18.68"
+    />
+    <line
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="1.91"
+      x1="15.82"
+      y1="15.82"
+      x2="15.82"
+      y2="18.68"
+    />
+    <line
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="1.91"
+      x1="19.64"
+      y1="15.82"
+      x2="19.64"
+      y2="18.68"
+    />
+  </svg>
+</template>
