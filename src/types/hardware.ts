@@ -10,8 +10,45 @@ export interface SystemInfo {
 
 export interface CpuInfo {
   name: string;
-  cores: number;
-  frequency: number;
+  vendor: string;
+  brand: string;
+  physical_cores: number;
+  logical_cores: number;
+  base_frequency_mhz: number;
+  max_frequency_mhz: number;
+  current_frequency_mhz: number;
+  cache_l1_kb: number;
+  cache_l2_kb: number;
+  cache_l3_kb: number;
+  family: string;
+  features: string[];
+  socket_designation: string;
+  voltage_v: number;
+  is_throttling: boolean;
+  current_clock_mhz: number;
+
+  has_htt: boolean;
+  max_logical_processor_ids: number;
+
+  has_vmx: boolean;
+  has_svm: boolean;
+
+  has_64bit_mode: boolean;
+  has_execute_disable: boolean;
+  has_1gib_pages: boolean;
+  has_rdtscp: boolean;
+  has_invariant_tsc: boolean;
+
+  pmu_version: number;
+  pmu_counters: number;
+  pmu_counter_width: number;
+
+  has_dts: boolean;
+  has_turbo_boost: boolean;
+  has_hwp: boolean;
+  has_hdc: boolean;
+  thermal_thresholds: number;
+  has_pln: boolean;
 }
 
 export interface MemoryInfo {

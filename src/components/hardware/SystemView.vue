@@ -75,7 +75,7 @@ const formattedMemory = computed(() => {
         </li>
 
         <!-- cpu -->
-        <li><strong>CPU:</strong> {{ cpu?.name }}</li>
+        <li><strong>CPU:</strong> {{ cpu?.brand }}</li>
 
         <!-- gpu -->
         <li><strong>GPU:</strong> {{ gpu?.name }}</li>
