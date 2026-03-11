@@ -49,6 +49,14 @@ const uptime = computed(() =>
         <SystemView
           v-if="activeTab === 'system'"
           :system="systemInfo"
+          :cpu="cpuInfo"
+          :gpu="gpuInfo?.[0] || null"
+          :memory="memoryInfo"
+          :memorySlots="physicalMemoryInfo"
+          :physicalDisks="physicalDisksInfo"
+          :motherboard="motherboardInfo"
+          :network="networkInfo"
+          :formatBytes="formatBytes"
           :uptime="uptime"
         />
         <CpuView v-else-if="activeTab === 'cpu'" :cpu="cpuInfo" />

@@ -31,10 +31,8 @@ const tabs = [
     class="w-56 shrink-0 flex flex-col bg-[#0a0a0e]/55 border-r border-white/10 px-4 py-6 backdrop-blur-md"
   >
     <!-- Header / Logo -->
-    <div
-      class="flex items-center gap-3 px-2 pb-6 border-b border-white/10 mb-4"
-    >
-      <h1 class="text-[17px] font-bold tracking-tight text-white/90">
+    <div class="flex items-center pb-6 border-b border-white/10 mb-4">
+      <h1 class="text-lg font-bold tracking-tight text-white/90 px-1">
         SpecScan
       </h1>
     </div>
