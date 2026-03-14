@@ -1,6 +1,6 @@
 [package]
 name = "SpecScan"
-version = "0.1.0"
+version = "0.1.1"
 description = "Know your machine. SpecScan fetches detailed hardware info through a clean, shareable interface."
 authors = ["Ilan Fonseca <ilan-_@hotmail.com>"]
 license = ""
