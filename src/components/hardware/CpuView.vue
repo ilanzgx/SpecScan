@@ -184,7 +184,7 @@ onMounted(() => {
           >
             Benchmark (PassMark)
           </h3>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <span class="block text-gray-400 text-sm">Multi-Core</span>
               <span class="font-mono text-xl text-white">{{
@@ -207,6 +207,30 @@ onMounted(() => {
               <span class="block text-gray-400 text-sm">Preço Est.</span>
               <span class="font-mono text-lg text-white">{{
                 cpuBenchmark.price !== "NA" ? cpuBenchmark.price : "N/A"
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Lançamento</span>
+              <span class="font-mono text-lg text-white">{{
+                cpuBenchmark.release_date
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Socket</span>
+              <span class="font-mono text-lg text-white">{{
+                cpuBenchmark.socket
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">TDP</span>
+              <span class="font-mono text-lg text-white">{{
+                cpuBenchmark.tdp !== "NA" ? cpuBenchmark.tdp + "W" : "N/A"
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Núcleos (Score)</span>
+              <span class="font-mono text-lg text-white">{{
+                cpuBenchmark.cores
               }}</span>
             </div>
           </div>

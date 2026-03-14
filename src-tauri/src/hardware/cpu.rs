@@ -284,6 +284,10 @@ pub struct CpuBenchmark {
     pub single_score: String,
     pub price: String,
     pub ranking: String,
+    pub release_date: String,
+    pub socket: String,
+    pub tdp: String,
+    pub cores: String,
 }
 
 #[tauri::command]
@@ -309,6 +313,10 @@ pub fn get_cpu_benchmark(brand: String) -> CpuBenchmark {
                     multi_score: record.get(4).unwrap_or("0").to_string(),
                     single_score: record.get(5).unwrap_or("0").to_string(),
                     price: record.get(6).unwrap_or("NA").to_string(),
+                    release_date: record.get(3).unwrap_or("N/A").to_string(),
+                    socket: record.get(7).unwrap_or("N/A").to_string(),
+                    tdp: record.get(8).unwrap_or("NA").to_string(),
+                    cores: record.get(10).unwrap_or("N/A").to_string(),
                 };
             }
         }

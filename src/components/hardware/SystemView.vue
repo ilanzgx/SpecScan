@@ -138,6 +138,16 @@ onMounted(() => {
                 {{ cpuBenchmark.single_score }} (Single)
               </span>
             </p>
+            <p v-if="cpuBenchmark?.release_date" class="text-xs px-4 py-0.5">
+              <span class="text-[13px] text-white/50">
+                Data de Lançamento: {{ cpuBenchmark.release_date }} | Socket:
+                {{ cpuBenchmark.socket }} | TDP:
+                {{
+                  cpuBenchmark.tdp !== "NA" ? cpuBenchmark.tdp + "W" : "N/A"
+                }}
+                | Núcleos: {{ cpuBenchmark.cores }}
+              </span>
+            </p>
           </div>
         </li>
 

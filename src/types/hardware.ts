@@ -13,6 +13,10 @@ export interface CpuBenchmark {
   single_score: string;
   price: string;
   ranking: string;
+  release_date: string;
+  socket: string;
+  tdp: string;
+  cores: string;
 }
 
 export interface CpuInfo {
