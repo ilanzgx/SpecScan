@@ -10,6 +10,15 @@ import type {
   // NetworkInfo,
 } from "../../types/hardware";
 
+import {
+  IconSystem,
+  IconMotherboard,
+  IconCpu,
+  IconGpu,
+  IconMemory,
+  IconDisk,
+} from "../icons";
+
 const props = defineProps<{
   system: SystemInfo | null;
   cpu: CpuInfo | null;
@@ -23,16 +32,30 @@ const props = defineProps<{
   uptime: string;
 }>();
 
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
+
+const parseMemoryType = (typeRaw: string) => {
+  if (!typeRaw) return "";
+  const match = typeRaw.match(/value:\s*(\w+)/);
+  if (match && match[1] && match[1] !== "Unknown") {
+    return match[1];
+  }
+  return "";
+};
 
 const formattedMemory = computed(() => {
-  if (!props.memorySlots || props.memorySlots.length === 0) {
+  if (
+    !props.motherboard?.memory_slots ||
+    props.motherboard.memory_slots.length === 0
+  ) {
     return props.memory
       ? props.formatBytes(props.memory.total_memory)
       : "Desconhecido";
   }
 
-  const populatedSlots = props.memorySlots.filter((s) => s.capacity_gb > 0);
+  const populatedSlots = props.motherboard.memory_slots.filter(
+    (s) => s.size_mb > 0,
+  );
 
   if (populatedSlots.length === 0) {
     return props.memory
@@ -42,16 +65,20 @@ const formattedMemory = computed(() => {
 
   const slotCount = populatedSlots.length;
 
-  const stickSizeGB = populatedSlots[0]?.capacity_gb ?? 0;
+  const stickSizeGB = Math.round((populatedSlots[0]?.size_mb ?? 0) / 1024);
   const stickSpeed = populatedSlots[0]?.speed_mhz ?? 0;
-  const stickType = populatedSlots[0]?.memory_type ?? "";
+  const stickType = parseMemoryType(populatedSlots[0]?.memory_type ?? "");
 
   let totalSum = 0;
-  for (const slot of props.memorySlots) {
-    totalSum += slot.capacity_gb * 1024 * 1024 * 1024;
+  for (const slot of props.motherboard.memory_slots) {
+    totalSum += slot.size_mb * 1024 * 1024;
   }
 
   return `${props.formatBytes(totalSum)} (${props.formatBytes(props.memory?.total_memory as number)} utilizável) (${slotCount}x${stickSizeGB}GB ${stickType} ${stickSpeed > 0 ? stickSpeed + "MHz" : ""})`.trim();
+});
+
+onMounted(() => {
+  console.log(props.motherboard?.memory_slots);
 });
 </script>
 
@@ -66,7 +93,10 @@ const formattedMemory = computed(() => {
       <ul class="space-y-4">
         <!-- os -->
         <li>
-          <strong>Sistema:</strong>
+          <div class="flex items-center gap-2">
+            <IconSystem class="w-5 h-5" />
+            <span class="font-bold text-blue-300">Sistema:</span>
+          </div>
           {{ system?.os_name }}
           {{ system?.os_version }}
           {{ system?.cpu_arch }}
@@ -74,54 +104,90 @@ const formattedMemory = computed(() => {
 
         <!-- motherboard -->
         <li>
-          <strong>Placa-Mãe:</strong>
-          {{ motherboard?.product }} por {{ motherboard?.manufacturer }}
+          <div class="">
+            <h1 class="flex items-center gap-2">
+              <IconMotherboard class="w-5 h-5" />
+              <span class="font-bold text-blue-300">Placa-Mãe:</span>
+            </h1>
+            <p>{{ motherboard?.manufacturer }} {{ motherboard?.product }}</p>
+          </div>
         </li>
 
         <!-- cpu -->
-        <li><strong>CPU:</strong> {{ cpu?.brand }}</li>
+        <li>
+          <div class="">
+            <h1 class="flex items-center gap-2">
+              <IconCpu class="w-5 h-5" />
+              <span class="font-bold text-blue-300">CPU:</span>
+            </h1>
+            <p>{{ cpu?.brand }}</p>
+          </div>
+        </li>
 
         <!-- gpu -->
-        <li><strong>GPU:</strong> {{ gpu?.name }}</li>
+        <li>
+          <div class="">
+            <h1 class="flex items-center gap-2">
+              <IconGpu class="w-5 h-5" />
+              <span class="font-bold text-blue-300">GPU:</span>
+            </h1>
+            <p>{{ gpu?.name }}</p>
+          </div>
+        </li>
 
         <!-- memory slots -->
         <li>
           <div class="flex flex-col">
-            <span>
-              <strong>Memória:</strong>
-              {{ formattedMemory }}
-            </span>
+            <h1 class="flex items-center gap-2">
+              <IconMemory class="w-5 h-5" />
+              <span class="font-bold text-blue-300">Memória:</span>
+            </h1>
+            <p>{{ formattedMemory }}</p>
             <ul
-              v-if="memorySlots && memorySlots.length > 0"
-              class="ml-5 mt-1 list-disc text-[13px] text-white/50"
+              v-if="
+                motherboard?.memory_slots && motherboard.memory_slots.length > 0
+              "
+              class="ml-5 mt-2 space-y-1.5 text-[13px] text-white/50"
             >
-              <template v-for="(slot, index) in memorySlots" :key="index">
-                <li v-if="slot.capacity_gb > 0">
-                  Slot {{ index + 1 }}: {{ slot.capacity_gb }}GB
-                  {{ slot.memory_type }}
-                  <template v-if="slot.speed_mhz > 0"
-                    >{{ slot.speed_mhz }}MHz</template
-                  >
-                  <template
-                    v-if="
-                      slot.manufacturer &&
-                      slot.manufacturer.trim() !== 'Unknown'
-                    "
-                  >
-                    ({{ slot.manufacturer.trim() }})
-                  </template>
-                </li>
-              </template>
+              <li
+                v-for="(slot, index) in motherboard.memory_slots"
+                :key="index"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-white/70 min-w-16">{{
+                    slot.slot_label || `Slot ${index + 1}`
+                  }}</span>
+                  <span v-if="slot.size_mb === 0" class="text-white/30 italic">
+                    (Vazio)
+                  </span>
+                  <span v-else>
+                    {{ Math.round(slot.size_mb / 1024) }}GB
+                    {{ parseMemoryType(slot.memory_type) }}
+                    <template v-if="slot.speed_mhz > 0">
+                      {{ slot.speed_mhz }}MHz
+                    </template>
+                    <template
+                      v-if="
+                        slot.manufacturer &&
+                        slot.manufacturer.trim() !== 'Unknown'
+                      "
+                    >
+                      <span>({{ slot.manufacturer.trim() }})</span>
+                    </template>
+                  </span>
+                </div>
+              </li>
             </ul>
           </div>
         </li>
 
         <li>
           <div class="flex flex-col">
-            <span>
-              <strong>Armazenamento:</strong>
-              {{ physicalDisks?.length }} disco(s)
-            </span>
+            <h1 class="flex items-center gap-2">
+              <IconDisk class="w-5 h-5" />
+              <span class="font-bold text-blue-300">Armazenamento:</span>
+            </h1>
+            <p>{{ physicalDisks?.length }} disco(s)</p>
             <ul
               v-if="physicalDisks && physicalDisks.length > 0"
               class="ml-5 mt-1 list-disc text-[13px] text-white/50"

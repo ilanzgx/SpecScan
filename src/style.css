@@ -1,12 +1,21 @@
 @import "tailwindcss";
 
-/* ─── Google Fonts ──────────────────────────────────────────────── */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+/* ─── Local Fonts ───────────────────────────────────────────────── */
+@font-face {
+  font-family: "Outfit";
+  src: url("./assets/fonts/Outfit/Outfit-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ─── Design Tokens ─────────────────────────────────────────────── */
 :root {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-sans: "Outfit", "Inter", system-ui, sans-serif;
+  --font-mono:
+    ui-mono, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 
   /* Fundo (aproveitando o vibrancy nativo) */
   --bg-app: transparent;

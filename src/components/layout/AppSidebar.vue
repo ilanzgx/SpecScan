@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useUpdater } from "../../composables/useUpdater";
-import IconSystem from "../icons/IconSystem.vue";
-import IconCpu from "../icons/IconCpu.vue";
-import IconGpu from "../icons/IconGpu.vue";
-import IconMemory from "../icons/IconMemory.vue";
-import IconDisk from "../icons/IconDisk.vue";
-import IconMotherboard from "../icons/IconMotherboard.vue";
-import IconNetwork from "../icons/IconNetwork.vue";
+import {
+  IconSystem,
+  IconCpu,
+  IconGpu,
+  IconMemory,
+  IconDisk,
+  IconMotherboard,
+  IconNetwork,
+} from "../icons";
 
 const props = defineProps<{
   activeTab: string;
