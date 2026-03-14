@@ -12,7 +12,8 @@
     "version": "bun run scripts/sync-version.ts",
     "test": "vitest run --reporter=tree",
     "test:unit": "vitest run --reporter=tree",
-    "test:coverage": "vitest run --reporter=tree --coverage"
+    "test:coverage": "vitest run --reporter=tree --coverage",
+    "prepare": "husky"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
@@ -30,6 +31,7 @@
     "@vitest/coverage-v8": "^4.1.0",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
+    "husky": "^9.1.7",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
     "vitest": "^4.1.0",
