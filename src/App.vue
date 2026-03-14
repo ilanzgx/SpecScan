@@ -14,6 +14,7 @@ const {
   isLoading,
   systemInfo,
   cpuInfo,
+  cpuBenchmark,
   memoryInfo,
   motherboardInfo,
   disksInfo,
@@ -50,6 +51,7 @@ const uptime = computed(() =>
           v-if="activeTab === 'system'"
           :system="systemInfo"
           :cpu="cpuInfo"
+          :cpuBenchmark="cpuBenchmark"
           :gpu="gpuInfo?.[0] || null"
           :memory="memoryInfo"
           :memorySlots="physicalMemoryInfo"
@@ -59,7 +61,11 @@ const uptime = computed(() =>
           :formatBytes="formatBytes"
           :uptime="uptime"
         />
-        <CpuView v-else-if="activeTab === 'cpu'" :cpu="cpuInfo" />
+        <CpuView
+          v-else-if="activeTab === 'cpu'"
+          :cpu="cpuInfo"
+          :cpuBenchmark="cpuBenchmark"
+        />
         <GpuView v-else-if="activeTab === 'gpu'" :gpus="gpuInfo" />
         <MemoryView
           v-else-if="activeTab === 'memory'"

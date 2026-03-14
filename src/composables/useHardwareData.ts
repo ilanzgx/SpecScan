@@ -12,12 +12,14 @@ import type {
   GpuInfo,
   NetworkInfo,
   NetworkAdapterInfo,
+  CpuBenchmark,
 } from "../types/hardware";
 
 function useHardwareDataInternal() {
   const isLoading = ref(true);
   const systemInfo = ref<SystemInfo | null>(null);
   const cpuInfo = ref<CpuInfo | null>(null);
+  const cpuBenchmark = ref<CpuBenchmark | null>(null);
   const memoryInfo = ref<MemoryInfo | null>(null);
   const motherboardInfo = ref<MotherboardInfo | null>(null);
   const disksInfo = ref<DiskInfo[] | null>(null);
@@ -34,7 +36,12 @@ function useHardwareDataInternal() {
         invoke<SystemInfo>("get_system_info").then(
           (v) => (systemInfo.value = v),
         ),
-        invoke<CpuInfo>("get_cpu_info").then((v) => (cpuInfo.value = v)),
+        invoke<CpuInfo>("get_cpu_info").then(async (v) => {
+          cpuInfo.value = v;
+          cpuBenchmark.value = await invoke<CpuBenchmark>("get_cpu_benchmark", {
+            brand: v.brand,
+          });
+        }),
         invoke<MemoryInfo>("get_memory_info").then(
           (v) => (memoryInfo.value = v),
         ),
@@ -87,6 +94,7 @@ function useHardwareDataInternal() {
     isLoading,
     systemInfo,
     cpuInfo,
+    cpuBenchmark,
     memoryInfo,
     motherboardInfo,
     disksInfo,

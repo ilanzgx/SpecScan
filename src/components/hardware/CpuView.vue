@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import type { CpuInfo } from "../../types/hardware";
+import type { CpuInfo, CpuBenchmark } from "../../types/hardware";
 
 const props = defineProps<{
   cpu: CpuInfo | null;
+  cpuBenchmark?: CpuBenchmark | null;
 }>();
 
 onMounted(() => {
   console.log(props.cpu);
+  console.log(props.cpuBenchmark);
 });
 </script>
 
@@ -170,6 +172,44 @@ onMounted(() => {
               >
             </li>
           </ul>
+        </div>
+
+        <!-- Benchmark -->
+        <div
+          v-if="cpuBenchmark && cpuBenchmark.ranking"
+          class="bg-blue-500/10 border border-blue-500/20 backdrop-blur-xl shadow-2xl p-4 rounded-xl"
+        >
+          <h3
+            class="font-semibold text-lg mb-4 border-b border-blue-500/30 pb-2 text-blue-400"
+          >
+            Benchmark (PassMark)
+          </h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <span class="block text-gray-400 text-sm">Multi-Core</span>
+              <span class="font-mono text-xl text-white">{{
+                cpuBenchmark.multi_score
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Single-Core</span>
+              <span class="font-mono text-xl text-white">{{
+                cpuBenchmark.single_score
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Ranking Global</span>
+              <span class="font-mono text-xl text-white"
+                >#{{ cpuBenchmark.ranking }}</span
+              >
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Preço Est.</span>
+              <span class="font-mono text-lg text-white">{{
+                cpuBenchmark.price !== "NA" ? cpuBenchmark.price : "N/A"
+              }}</span>
+            </div>
+          </div>
         </div>
 
         <!-- Thermal & Energia -->

@@ -7,6 +7,7 @@ import type {
   PhysicalMemorySlot,
   PhysicalDiskInfo,
   MotherboardInfo,
+  CpuBenchmark,
   // NetworkInfo,
 } from "../../types/hardware";
 
@@ -27,6 +28,7 @@ const props = defineProps<{
   memorySlots: PhysicalMemorySlot[] | null;
   physicalDisks: PhysicalDiskInfo[] | null;
   motherboard: MotherboardInfo | null;
+  cpuBenchmark?: CpuBenchmark | null;
   // network: NetworkInfo[] | null;
   formatBytes: (bytes: number) => string;
   uptime: string;
@@ -120,7 +122,22 @@ onMounted(() => {
               <IconCpu class="w-5 h-5" />
               <span class="font-bold text-blue-300">CPU:</span>
             </h1>
-            <p>{{ cpu?.brand }}</p>
+            <p>
+              {{ cpu?.brand }}
+              <span
+                v-if="cpuBenchmark?.ranking"
+                class="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30"
+              >
+                Ranking: #{{ cpuBenchmark.ranking }}
+              </span>
+            </p>
+            <p v-if="cpuBenchmark?.multi_score" class="text-xs px-4 py-0.5">
+              <span class="text-[13px] text-white/50">
+                PassMark Score:
+                {{ cpuBenchmark.multi_score }} (Multi) /
+                {{ cpuBenchmark.single_score }} (Single)
+              </span>
+            </p>
           </div>
         </li>
 

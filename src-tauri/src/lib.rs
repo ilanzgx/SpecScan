@@ -7,6 +7,7 @@ pub fn run() {
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![
       hardware::cpu::get_cpu_info,
+      hardware::cpu::get_cpu_benchmark,
       hardware::gpu::get_gpu_info,
       hardware::motherboard::get_motherboard_info,
       hardware::memory::get_memory_info,

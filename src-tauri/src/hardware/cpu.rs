@@ -1,6 +1,8 @@
 use serde::Serialize;
 use sysinfo::System;
 use raw_cpuid::CpuId;
+use std::fs::File;
+use csv::ReaderBuilder;
 
 #[derive(Serialize)]
 pub struct CpuInfo {
@@ -274,4 +276,43 @@ pub fn get_cpu_info() -> CpuInfo {
         thermal_thresholds,
         has_pln,
     }
+}
+
+#[derive(Serialize, Default)]
+pub struct CpuBenchmark {
+    pub multi_score: String,
+    pub single_score: String,
+    pub price: String,
+    pub ranking: String,
+}
+
+#[tauri::command]
+pub fn get_cpu_benchmark(brand: String) -> CpuBenchmark {
+    let csv_path = "resources/cpus.csv";
+
+    let file = match File::open(csv_path) {
+        Ok(f) => f,
+        Err(_) => return CpuBenchmark::default(),
+    };
+
+    let mut rdr = ReaderBuilder::new().from_reader(file);
+
+    let search_name = brand.to_lowercase();
+
+    for result in rdr.records() {
+        if let Ok(record) = result {
+            let model_name = record.get(1).unwrap_or("").to_lowercase();
+
+            if search_name.contains(&model_name) || model_name.contains(&search_name) {
+                return CpuBenchmark {
+                    ranking: record.get(0).unwrap_or("N/A").to_string(),
+                    multi_score: record.get(4).unwrap_or("0").to_string(),
+                    single_score: record.get(5).unwrap_or("0").to_string(),
+                    price: record.get(6).unwrap_or("NA").to_string(),
+                };
+            }
+        }
+    }
+
+    CpuBenchmark::default()
 }

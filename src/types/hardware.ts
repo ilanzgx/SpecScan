@@ -8,6 +8,13 @@ export interface SystemInfo {
   boot_time_seconds: number;
 }
 
+export interface CpuBenchmark {
+  multi_score: string;
+  single_score: string;
+  price: string;
+  ranking: string;
+}
+
 export interface CpuInfo {
   name: string;
   vendor: string;
@@ -48,6 +55,7 @@ export interface CpuInfo {
   has_hdc: boolean;
   thermal_thresholds: number;
   has_pln: boolean;
+  benchmark?: CpuBenchmark;
 }
 
 export interface MemoryInfo {
