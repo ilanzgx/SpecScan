@@ -12,13 +12,17 @@ defineProps<{
   <div class="p-4 space-y-6">
     <h2 class="text-2xl font-bold">Rede</h2>
 
-    <div v-if="adapters && adapters.length > 0">
-      <h3 class="text-xl font-bold mb-2">Adaptadores Físicos</h3>
-      <div v-for="adapter in adapters" :key="adapter.mac_address" class="mb-4">
+    <div v-if="adapters && adapters.length > 0" class="space-y-4">
+      <h3 class="text-xl font-bold">Adaptadores Físicos</h3>
+      <div
+        v-for="adapter in adapters"
+        :key="adapter.mac_address"
+        class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl"
+      >
         <h4 class="font-bold border-b border-white/10 pb-1 mb-2">
           {{ adapter.name }}
         </h4>
-        <ul class="space-y-1">
+        <ul class="space-y-1 text-sm">
           <li><strong>Fabricante:</strong> {{ adapter.manufacturer }}</li>
           <li><strong>Tipo de Conexão:</strong> {{ adapter.adapter_type }}</li>
           <li>
@@ -33,13 +37,17 @@ defineProps<{
       </div>
     </div>
 
-    <div v-if="interfaces && interfaces.length > 0">
-      <h3 class="text-xl font-bold mb-2">Interfaces de Tráfego Ativas</h3>
-      <div v-for="net in interfaces" :key="net.interface_name" class="mb-4">
+    <div v-if="interfaces && interfaces.length > 0" class="space-y-4">
+      <h3 class="text-xl font-bold">Interfaces de Tráfego Ativas</h3>
+      <div
+        v-for="net in interfaces"
+        :key="net.interface_name"
+        class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl"
+      >
         <h4 class="font-bold border-b border-white/10 pb-1 mb-2">
           Conexão: {{ net.interface_name }}
         </h4>
-        <ul class="space-y-1">
+        <ul class="space-y-1 text-sm">
           <li><strong>MAC Address:</strong> {{ net.mac_address }}</li>
           <li>
             <strong>Dados Recebidos (Download):</strong>

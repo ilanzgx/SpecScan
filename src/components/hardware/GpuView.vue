@@ -10,7 +10,11 @@ defineProps<{
   <div class="p-4">
     <h2 class="text-2xl font-bold mb-4">Placa de Vídeo / GPU</h2>
     <div v-if="gpus && gpus.length > 0" class="space-y-6">
-      <div v-for="(gpu, i) in gpus" :key="gpu.name">
+      <div
+        v-for="(gpu, i) in gpus"
+        :key="gpu.name"
+        class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl"
+      >
         <h3 class="text-xl font-bold mb-2">GPU {{ i + 1 }}: {{ gpu.name }}</h3>
         <ul class="space-y-1">
           <li><strong>Fabricante:</strong> {{ gpu.manufacturer }}</li>
