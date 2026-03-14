@@ -1,4 +1,6 @@
 use serde::Serialize;
+use std::fs::File;
+use csv::ReaderBuilder;
 
 #[derive(Serialize)]
 pub struct GpuInfo {
@@ -133,4 +135,57 @@ fn unix_days_to_date(days: i64) -> (i64, u32, u32) {
     let m = if mp < 10 { mp + 3 } else { mp - 9 };
     let year = if m <= 2 { y + 1 } else { y };
     (year, m, d)
+}
+
+#[derive(Serialize, Default)]
+pub struct GpuBenchmark {
+    pub ranking: String,
+    pub g3d_score: String,
+    pub g2d_score: String,
+    pub price: String,
+    pub release_date: String,
+    pub tdp: String,
+    pub core_clock: String,
+    pub memory_clock: String,
+    pub vram: String,
+}
+
+#[tauri::command]
+pub fn get_gpu_benchmark(name: String) -> GpuBenchmark {
+    let csv_path = "resources/gpus.csv";
+
+    let file = match File::open(csv_path) {
+        Ok(f) => f,
+        Err(_) => return GpuBenchmark::default(),
+    };
+
+    let mut rdr = ReaderBuilder::new().flexible(true).from_reader(file);
+
+    let search_name = name.to_lowercase()
+        .replace("(tm)", "")
+        .replace("(r)", "")
+        .replace("(c)", "")
+        .replace(" graphics", "");
+
+    for result in rdr.records() {
+        if let Ok(record) = result {
+            let model_name = record.get(1).unwrap_or("").to_lowercase();
+
+            if search_name.contains(&model_name) || model_name.contains(&search_name) {
+                return GpuBenchmark {
+                    ranking: record.get(0).unwrap_or("N/A").to_string(),
+                    g3d_score: record.get(4).unwrap_or("0").to_string(),
+                    g2d_score: record.get(5).unwrap_or("0").to_string(),
+                    price: record.get(6).unwrap_or("NA").to_string(),
+                    release_date: record.get(3).unwrap_or("N/A").to_string(),
+                    tdp: record.get(8).unwrap_or("NA").to_string(),
+                    core_clock: record.get(9).unwrap_or("N/A").to_string(),
+                    memory_clock: record.get(10).unwrap_or("N/A").to_string(),
+                    vram: record.get(11).unwrap_or("N/A").to_string(),
+                };
+            }
+        }
+    }
+
+    GpuBenchmark::default()
 }

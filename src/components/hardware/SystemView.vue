@@ -85,9 +85,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="p-4 flex items-center justify-center min-h-full py-12">
+  <div class="p-4 flex items-center justify-center min-h-full py-6">
     <div
-      class="bg-white/5 backdrop-blur-xl shadow-2xl p-8 rounded-xl w-full max-w-2xl"
+      class="bg-white/5 backdrop-blur-xl shadow-2xl px-8 py-6 rounded-xl w-full max-w-2xl"
     >
       <h2 class="text-2xl font-bold mb-6 border-b border-gray-800/35 pb-3">
         Resumo da configuração
@@ -142,9 +142,7 @@ onMounted(() => {
               <span class="text-[13px] text-white/50">
                 Data de Lançamento: {{ cpuBenchmark.release_date }} | Socket:
                 {{ cpuBenchmark.socket }} | TDP:
-                {{
-                  cpuBenchmark.tdp !== "NA" ? cpuBenchmark.tdp + "W" : "N/A"
-                }}
+                {{ cpuBenchmark.tdp !== "NA" ? cpuBenchmark.tdp + "W" : "N/A" }}
                 | Núcleos: {{ cpuBenchmark.cores }}
               </span>
             </p>
@@ -158,7 +156,32 @@ onMounted(() => {
               <IconGpu class="w-5 h-5" />
               <span class="font-bold text-blue-300">GPU:</span>
             </h1>
-            <p>{{ gpu?.name }}</p>
+            <p>
+              {{ gpu?.name }}
+              <span
+                v-if="gpu?.benchmark?.ranking"
+                class="text-xs bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30 ml-2"
+              >
+                Ranking: #{{ gpu.benchmark.ranking }}
+              </span>
+            </p>
+            <p v-if="gpu?.benchmark?.g3d_score" class="text-xs px-4 py-0.5">
+              <span class="text-[13px] text-white/50">
+                PassMark Score:
+                {{ gpu.benchmark.g3d_score }} (G3D) /
+                {{ gpu.benchmark.g2d_score }} (G2D)
+              </span>
+            </p>
+            <p v-if="gpu?.benchmark?.release_date" class="text-xs px-4 py-0.5">
+              <span class="text-[13px] text-white/50">
+                Data de Lançamento: {{ gpu.benchmark.release_date }} | TDP:
+                {{
+                  gpu.benchmark.tdp !== "NA" ? gpu.benchmark.tdp + "W" : "N/A"
+                }}
+                | Memória: {{ gpu.benchmark.vram }} | Preço Est.:
+                {{ gpu.benchmark.price !== "NA" ? gpu.benchmark.price : "N/A" }}
+              </span>
+            </p>
           </div>
         </li>
 

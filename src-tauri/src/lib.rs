@@ -9,6 +9,7 @@ pub fn run() {
       hardware::cpu::get_cpu_info,
       hardware::cpu::get_cpu_benchmark,
       hardware::gpu::get_gpu_info,
+      hardware::gpu::get_gpu_benchmark,
       hardware::motherboard::get_motherboard_info,
       hardware::memory::get_memory_info,
       hardware::memory::get_physical_memory_info,

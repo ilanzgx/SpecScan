@@ -13,6 +13,7 @@ import type {
   NetworkInfo,
   NetworkAdapterInfo,
   CpuBenchmark,
+  GpuBenchmark,
 } from "../types/hardware";
 
 function useHardwareDataInternal() {
@@ -55,7 +56,17 @@ function useHardwareDataInternal() {
         invoke<PhysicalMemorySlot[]>("get_physical_memory_info").then(
           (v) => (physicalMemoryInfo.value = v),
         ),
-        invoke<GpuInfo[]>("get_gpu_info").then((v) => (gpuInfo.value = v)),
+        invoke<GpuInfo[]>("get_gpu_info").then(async (v) => {
+          const gpusWithBenchmarks = await Promise.all(
+            v.map(async (gpu) => {
+              gpu.benchmark = await invoke<GpuBenchmark>("get_gpu_benchmark", {
+                name: gpu.name,
+              });
+              return gpu;
+            }),
+          );
+          gpuInfo.value = gpusWithBenchmarks;
+        }),
         invoke<NetworkInfo[]>("get_network_info").then(
           (v) => (networkInfo.value = v),
         ),

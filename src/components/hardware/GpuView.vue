@@ -38,6 +38,73 @@ defineProps<{
             <strong>Profundidade de Cor:</strong> {{ gpu.bits_per_pixel }} bpp
           </li>
         </ul>
+
+        <div
+          v-if="
+            gpu.benchmark &&
+            gpu.benchmark.ranking !== 'N/A' &&
+            gpu.benchmark.ranking
+          "
+          class="mt-4 bg-cyan-500/10 border border-cyan-500/20 p-4 rounded-xl"
+        >
+          <h4
+            class="font-semibold text-lg mb-4 border-b border-cyan-500/30 pb-2 text-cyan-400"
+          >
+            Benchmark (PassMark)
+          </h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <span class="block text-gray-400 text-sm">G3D Score</span>
+              <span class="font-mono text-xl text-white">{{
+                gpu.benchmark.g3d_score
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">G2D Score</span>
+              <span class="font-mono text-xl text-white">{{
+                gpu.benchmark.g2d_score
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Ranking Global</span>
+              <span class="font-mono text-xl text-white"
+                >#{{ gpu.benchmark.ranking }}</span
+              >
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Preço Est.</span>
+              <span class="font-mono text-lg text-white">{{
+                gpu.benchmark.price !== "NA" ? gpu.benchmark.price : "N/A"
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Lançamento</span>
+              <span class="font-mono text-lg text-white">{{
+                gpu.benchmark.release_date
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Clock</span>
+              <span class="font-mono text-lg text-white">{{
+                gpu.benchmark.core_clock !== "NA"
+                  ? gpu.benchmark.core_clock
+                  : "N/A"
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">TDP</span>
+              <span class="font-mono text-lg text-white">{{
+                gpu.benchmark.tdp !== "NA" ? gpu.benchmark.tdp + "W" : "N/A"
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-400 text-sm">Memória (Score)</span>
+              <span class="font-mono text-lg text-white">{{
+                gpu.benchmark.vram
+              }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <p v-else>Nenhuma GPU encontrada ou carregando...</p>

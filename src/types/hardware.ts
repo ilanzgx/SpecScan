@@ -125,6 +125,18 @@ export interface PhysicalMemorySlot {
   form_factor: string;
 }
 
+export interface GpuBenchmark {
+  ranking: string;
+  g3d_score: string;
+  g2d_score: string;
+  price: string;
+  release_date: string;
+  tdp: string;
+  core_clock: string;
+  memory_clock: string;
+  vram: string;
+}
+
 export interface GpuInfo {
   name: string;
   manufacturer: string;
@@ -139,6 +151,7 @@ export interface GpuInfo {
   max_refresh_rate: number;
   min_refresh_rate: number;
   video_mode_description: string;
+  benchmark?: GpuBenchmark;
 }
 
 export interface NetworkInfo {

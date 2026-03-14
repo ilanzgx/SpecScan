@@ -301,7 +301,11 @@ pub fn get_cpu_benchmark(brand: String) -> CpuBenchmark {
 
     let mut rdr = ReaderBuilder::new().from_reader(file);
 
-    let search_name = brand.to_lowercase();
+    let search_name = brand.to_lowercase()
+        .replace("(tm)", "")
+        .replace("(r)", "")
+        .replace("(c)", "")
+        .replace(" graphics", "");
 
     for result in rdr.records() {
         if let Ok(record) = result {
