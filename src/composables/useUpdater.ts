@@ -1,8 +1,9 @@
 import { ref, onMounted } from "vue";
+import { createSharedComposable } from "@vueuse/core";
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 
-export function useUpdater() {
+function useUpdaterInternal() {
   const isUpdateChecking = ref(false);
   const updateAvailable = ref<null | Awaited<ReturnType<typeof check>>>(null);
   const isUpdating = ref(false);
@@ -45,3 +46,5 @@ export function useUpdater() {
     installUpdate,
   };
 }
+
+export const useUpdater = createSharedComposable(useUpdaterInternal);

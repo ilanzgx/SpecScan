@@ -1,4 +1,5 @@
 import { ref, onMounted } from "vue";
+import { createSharedComposable } from "@vueuse/core";
 import { invoke } from "@tauri-apps/api/core";
 import type {
   SystemInfo,
@@ -13,7 +14,7 @@ import type {
   NetworkAdapterInfo,
 } from "../types/hardware";
 
-export function useHardwareData() {
+function useHardwareDataInternal() {
   const isLoading = ref(true);
   const systemInfo = ref<SystemInfo | null>(null);
   const cpuInfo = ref<CpuInfo | null>(null);
@@ -99,3 +100,5 @@ export function useHardwareData() {
     fetchAll,
   };
 }
+
+export const useHardwareData = createSharedComposable(useHardwareDataInternal);
