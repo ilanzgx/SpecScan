@@ -167,23 +167,21 @@ pub fn get_gpu_benchmark(name: String) -> GpuBenchmark {
         .replace("(c)", "")
         .replace(" graphics", "");
 
-    for result in rdr.records() {
-        if let Ok(record) = result {
-            let model_name = record.get(1).unwrap_or("").to_lowercase();
+    for record in rdr.records().flatten() {
+        let model_name = record.get(1).unwrap_or("").to_lowercase();
 
-            if search_name.contains(&model_name) || model_name.contains(&search_name) {
-                return GpuBenchmark {
-                    ranking: record.get(0).unwrap_or("N/A").to_string(),
-                    g3d_score: record.get(4).unwrap_or("0").to_string(),
-                    g2d_score: record.get(5).unwrap_or("0").to_string(),
-                    price: record.get(6).unwrap_or("NA").to_string(),
-                    release_date: record.get(3).unwrap_or("N/A").to_string(),
-                    tdp: record.get(8).unwrap_or("NA").to_string(),
-                    core_clock: record.get(9).unwrap_or("N/A").to_string(),
-                    memory_clock: record.get(10).unwrap_or("N/A").to_string(),
-                    vram: record.get(11).unwrap_or("N/A").to_string(),
-                };
-            }
+        if search_name.contains(&model_name) || model_name.contains(&search_name) {
+            return GpuBenchmark {
+                ranking: record.get(0).unwrap_or("N/A").to_string(),
+                g3d_score: record.get(4).unwrap_or("0").to_string(),
+                g2d_score: record.get(5).unwrap_or("0").to_string(),
+                price: record.get(6).unwrap_or("NA").to_string(),
+                release_date: record.get(3).unwrap_or("N/A").to_string(),
+                tdp: record.get(8).unwrap_or("NA").to_string(),
+                core_clock: record.get(9).unwrap_or("N/A").to_string(),
+                memory_clock: record.get(10).unwrap_or("N/A").to_string(),
+                vram: record.get(11).unwrap_or("N/A").to_string(),
+            };
         }
     }
 

@@ -307,22 +307,20 @@ pub fn get_cpu_benchmark(brand: String) -> CpuBenchmark {
         .replace("(c)", "")
         .replace(" graphics", "");
 
-    for result in rdr.records() {
-        if let Ok(record) = result {
-            let model_name = record.get(1).unwrap_or("").to_lowercase();
+    for record in rdr.records().flatten() {
+        let model_name = record.get(1).unwrap_or("").to_lowercase();
 
-            if search_name.contains(&model_name) || model_name.contains(&search_name) {
-                return CpuBenchmark {
-                    ranking: record.get(0).unwrap_or("N/A").to_string(),
-                    multi_score: record.get(4).unwrap_or("0").to_string(),
-                    single_score: record.get(5).unwrap_or("0").to_string(),
-                    price: record.get(6).unwrap_or("NA").to_string(),
-                    release_date: record.get(3).unwrap_or("N/A").to_string(),
-                    socket: record.get(7).unwrap_or("N/A").to_string(),
-                    tdp: record.get(8).unwrap_or("NA").to_string(),
-                    cores: record.get(10).unwrap_or("N/A").to_string(),
-                };
-            }
+        if search_name.contains(&model_name) || model_name.contains(&search_name) {
+            return CpuBenchmark {
+                ranking: record.get(0).unwrap_or("N/A").to_string(),
+                multi_score: record.get(4).unwrap_or("0").to_string(),
+                single_score: record.get(5).unwrap_or("0").to_string(),
+                price: record.get(6).unwrap_or("NA").to_string(),
+                release_date: record.get(3).unwrap_or("N/A").to_string(),
+                socket: record.get(7).unwrap_or("N/A").to_string(),
+                tdp: record.get(8).unwrap_or("NA").to_string(),
+                cores: record.get(10).unwrap_or("N/A").to_string(),
+            };
         }
     }
 
