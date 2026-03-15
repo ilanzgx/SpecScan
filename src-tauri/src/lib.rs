@@ -4,8 +4,19 @@ mod hardware;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![
+  let mut builder = tauri::Builder::default()
+    .plugin(tauri_plugin_process::init())
+    .plugin(tauri_plugin_updater::Builder::new().build());
+
+  if cfg!(debug_assertions) {
+    builder = builder.plugin(
+      tauri_plugin_log::Builder::default()
+        .level(log::LevelFilter::Info)
+        .build(),
+    );
+  }
+
+  builder.invoke_handler(tauri::generate_handler![
       hardware::cpu::get_cpu_info,
       hardware::cpu::get_cpu_benchmark,
       hardware::gpu::get_gpu_info,
@@ -37,16 +48,6 @@ pub fn run() {
         let _ = window.eval("document.body.classList.add('linux-fallback');");
       }*/
 
-      app.handle().plugin(tauri_plugin_process::init())?;
-      app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
-
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
       Ok(())
     })
     .run(tauri::generate_context!())

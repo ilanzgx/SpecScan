@@ -3,6 +3,7 @@ use sysinfo::System;
 use raw_cpuid::CpuId;
 use std::fs::File;
 use csv::ReaderBuilder;
+use tauri::Manager;
 
 #[derive(Serialize)]
 pub struct CpuInfo {
@@ -291,8 +292,9 @@ pub struct CpuBenchmark {
 }
 
 #[tauri::command]
-pub fn get_cpu_benchmark(brand: String) -> CpuBenchmark {
-    let csv_path = "resources/cpus.csv";
+pub fn get_cpu_benchmark(app_handle: tauri::AppHandle, brand: String) -> CpuBenchmark {
+    let csv_path = app_handle.path().resolve("resources/cpus.csv", tauri::path::BaseDirectory::Resource)
+        .unwrap_or_else(|_| "resources/cpus.csv".into());
 
     let file = match File::open(csv_path) {
         Ok(f) => f,

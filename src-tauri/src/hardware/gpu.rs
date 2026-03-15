@@ -1,6 +1,7 @@
 use serde::Serialize;
 use std::fs::File;
 use csv::ReaderBuilder;
+use tauri::Manager;
 
 #[derive(Serialize)]
 pub struct GpuInfo {
@@ -151,8 +152,9 @@ pub struct GpuBenchmark {
 }
 
 #[tauri::command]
-pub fn get_gpu_benchmark(name: String) -> GpuBenchmark {
-    let csv_path = "resources/gpus.csv";
+pub fn get_gpu_benchmark(app_handle: tauri::AppHandle, name: String) -> GpuBenchmark {
+    let csv_path = app_handle.path().resolve("resources/gpus.csv", tauri::path::BaseDirectory::Resource)
+        .unwrap_or_else(|_| "resources/gpus.csv".into());
 
     let file = match File::open(csv_path) {
         Ok(f) => f,
