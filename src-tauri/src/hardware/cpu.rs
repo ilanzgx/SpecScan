@@ -1,8 +1,8 @@
-use serde::Serialize;
-use sysinfo::System;
-use raw_cpuid::CpuId;
-use std::fs::File;
 use csv::ReaderBuilder;
+use raw_cpuid::CpuId;
+use serde::Serialize;
+use std::fs::File;
+use sysinfo::System;
 use tauri::Manager;
 
 #[derive(Serialize)]
@@ -58,9 +58,18 @@ pub fn get_cpu_info() -> CpuInfo {
     let brand = cpuid
         .get_processor_brand_string()
         .map(|s| s.as_str().trim().to_string())
-        .unwrap_or_else(|| sys.cpus().first().map(|c| c.brand().to_string()).unwrap_or_else(|| "Unknown CPU".to_string()));
+        .unwrap_or_else(|| {
+            sys.cpus()
+                .first()
+                .map(|c| c.brand().to_string())
+                .unwrap_or_else(|| "Unknown CPU".to_string())
+        });
 
-    let name = sys.cpus().first().map(|cpu| cpu.name().to_string()).unwrap_or_else(|| "Unknown".to_string());
+    let name = sys
+        .cpus()
+        .first()
+        .map(|cpu| cpu.name().to_string())
+        .unwrap_or_else(|| "Unknown".to_string());
 
     let mut cache_l1_kb = 0;
     let mut cache_l2_kb = 0;
@@ -101,21 +110,45 @@ pub fn get_cpu_info() -> CpuInfo {
         max_logical_processor_ids = fi.max_logical_processor_ids();
         has_vmx = fi.has_vmx();
 
-        if fi.has_avx() { features.push("AVX".to_string()); }
-        if fi.has_sse() { features.push("SSE".to_string()); }
-        if fi.has_sse2() { features.push("SSE2".to_string()); }
-        if fi.has_sse3() { features.push("SSE3".to_string()); }
-        if fi.has_ssse3() { features.push("SSSE3".to_string()); }
-        if fi.has_sse41() { features.push("SSE4.1".to_string()); }
-        if fi.has_sse42() { features.push("SSE4.2".to_string()); }
-        if fi.has_fma() { features.push("FMA".to_string()); }
-        if fi.has_aesni() { features.push("AES".to_string()); }
-        if fi.has_hypervisor() { features.push("Hypervisor".to_string()); }
+        if fi.has_avx() {
+            features.push("AVX".to_string());
+        }
+        if fi.has_sse() {
+            features.push("SSE".to_string());
+        }
+        if fi.has_sse2() {
+            features.push("SSE2".to_string());
+        }
+        if fi.has_sse3() {
+            features.push("SSE3".to_string());
+        }
+        if fi.has_ssse3() {
+            features.push("SSSE3".to_string());
+        }
+        if fi.has_sse41() {
+            features.push("SSE4.1".to_string());
+        }
+        if fi.has_sse42() {
+            features.push("SSE4.2".to_string());
+        }
+        if fi.has_fma() {
+            features.push("FMA".to_string());
+        }
+        if fi.has_aesni() {
+            features.push("AES".to_string());
+        }
+        if fi.has_hypervisor() {
+            features.push("Hypervisor".to_string());
+        }
     }
 
     if let Some(ext) = cpuid.get_extended_feature_info() {
-        if ext.has_avx2() { features.push("AVX2".to_string()); }
-        if ext.has_avx512f() { features.push("AVX-512".to_string()); }
+        if ext.has_avx2() {
+            features.push("AVX2".to_string());
+        }
+        if ext.has_avx512f() {
+            features.push("AVX-512".to_string());
+        }
     }
 
     let mut has_svm = false;
@@ -183,8 +216,8 @@ pub fn get_cpu_info() -> CpuInfo {
 
     #[cfg(target_os = "windows")]
     {
-        use std::process::Command;
         use std::os::windows::process::CommandExt;
+        use std::process::Command;
 
         const CREATE_NO_WINDOW: u32 = 0x08000000;
 
@@ -233,7 +266,8 @@ pub fn get_cpu_info() -> CpuInfo {
     }
 
     let logical_cores = sys.cpus().len() as u32;
-    let physical_cores = sysinfo::System::physical_core_count().unwrap_or(logical_cores as usize) as u32;
+    let physical_cores =
+        sysinfo::System::physical_core_count().unwrap_or(logical_cores as usize) as u32;
 
     // Use sysinfo frequency as fallback if WMI failed
     let sys_curr_freq = sys.cpus().first().map(|cpu| cpu.frequency()).unwrap_or(0);
@@ -293,7 +327,9 @@ pub struct CpuBenchmark {
 
 #[tauri::command]
 pub fn get_cpu_benchmark(app_handle: tauri::AppHandle, brand: String) -> CpuBenchmark {
-    let csv_path = app_handle.path().resolve("resources/cpus.csv", tauri::path::BaseDirectory::Resource)
+    let csv_path = app_handle
+        .path()
+        .resolve("resources/cpus.csv", tauri::path::BaseDirectory::Resource)
         .unwrap_or_else(|_| "resources/cpus.csv".into());
 
     let file = match File::open(csv_path) {
@@ -303,7 +339,8 @@ pub fn get_cpu_benchmark(app_handle: tauri::AppHandle, brand: String) -> CpuBenc
 
     let mut rdr = ReaderBuilder::new().from_reader(file);
 
-    let search_name = brand.to_lowercase()
+    let search_name = brand
+        .to_lowercase()
         .replace("(tm)", "")
         .replace("(r)", "")
         .replace("(c)", "")

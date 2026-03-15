@@ -34,7 +34,11 @@ const props = defineProps<{
   uptime: string;
 }>();
 
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
+import * as htmlToImage from "html-to-image";
+import { save, message } from "@tauri-apps/plugin-dialog";
+import { writeFile } from "@tauri-apps/plugin-fs";
+import { getVersion } from "@tauri-apps/api/app";
 
 const parseMemoryType = (typeRaw: string) => {
   if (!typeRaw) return "";
@@ -79,19 +83,134 @@ const formattedMemory = computed(() => {
   return `${props.formatBytes(totalSum)} (${props.formatBytes(props.memory?.total_memory as number)} utilizável) (${slotCount}x${stickSizeGB}GB ${stickType} ${stickSpeed > 0 ? stickSpeed + "MHz" : ""})`.trim();
 });
 
-onMounted(() => {
+const appVersion = ref("");
+
+onMounted(async () => {
   console.log(props.motherboard?.memory_slots);
+  try {
+    appVersion.value = await getVersion();
+  } catch (error) {
+    console.warn("Falha ao obter versão:", error);
+  }
 });
+
+const summaryRef = ref<HTMLElement | null>(null);
+const isGenerating = ref(false);
+
+const downloadSummaryImage = async () => {
+  if (!summaryRef.value) return;
+  try {
+    isGenerating.value = true;
+
+    // small delay to ensure UI updated button state
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const dataUrl = await htmlToImage.toPng(summaryRef.value, {
+      quality: 1,
+      pixelRatio: 2,
+      backgroundColor: "#0f172a", // background color
+      filter: (node) => {
+        if (
+          node instanceof HTMLElement &&
+          node.dataset.ignoreInImage === "true"
+        ) {
+          return false;
+        }
+        return true;
+      },
+    });
+
+    const defaultFilename = `SpecScan-${new Date().toISOString().slice(0, 10)}.png`;
+
+    // open native dialog to choose where to save
+    const selectedPath = await save({
+      filters: [{ name: "Imagem", extensions: ["png"] }],
+      defaultPath: defaultFilename,
+    });
+
+    if (selectedPath) {
+      // extract only base64 data from dataUrl
+      const base64Data = dataUrl.split(",")[1];
+      if (!base64Data) throw new Error("Falha ao processar dados da imagem.");
+
+      // convert base64 data to array of bytes (Uint8Array)
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      await writeFile(selectedPath, bytes);
+    }
+  } catch (error: any) {
+    console.error("Erro ao gerar a imagem:", error);
+    await message(`Erro ao salvar imagem: ${error.message || error}`, {
+      title: "Erro",
+      kind: "error",
+    });
+  } finally {
+    isGenerating.value = false;
+  }
+};
 </script>
 
 <template>
   <div class="p-4 flex items-center justify-center min-h-full py-6">
     <div
-      class="bg-white/5 backdrop-blur-xl shadow-2xl px-8 py-6 rounded-xl w-full max-w-2xl"
+      ref="summaryRef"
+      class="relative bg-white/5 backdrop-blur-xl shadow-2xl px-8 py-6 rounded-xl w-full max-w-2xl"
     >
-      <h2 class="text-2xl font-bold mb-6 border-b border-gray-800/35 pb-3">
-        Resumo da configuração
-      </h2>
+      <div
+        class="flex items-center justify-between mb-6 border-b border-gray-800/35 pb-3"
+      >
+        <h2 class="text-2xl font-bold">Resumo da configuração</h2>
+
+        <button
+          @click="downloadSummaryImage"
+          :disabled="isGenerating"
+          data-ignore-in-image="true"
+          class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Salvar Resumo como Imagem"
+        >
+          <svg
+            v-if="!isGenerating"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <svg
+            v-else
+            class="animate-spin w-4 h-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          {{ isGenerating ? "Gerando..." : "Gerar Imagem" }}
+        </button>
+      </div>
       <ul class="space-y-4">
         <!-- os -->
         <li>
@@ -249,6 +368,17 @@ onMounted(() => {
           </div>
         </li>
       </ul>
+
+      <!-- watermark visible only during image generation -->
+      <div
+        v-if="isGenerating"
+        class="absolute bottom-4 right-6 text-white/30 text-[11px] font-medium flex items-center gap-1.5 opacity-90"
+      >
+        <span class="text-white">SpecScan</span>
+        <span class="text-gray-500">{{
+          appVersion ? "v" + appVersion : ""
+        }}</span>
+      </div>
     </div>
   </div>
 </template>

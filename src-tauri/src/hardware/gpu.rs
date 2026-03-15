@@ -1,6 +1,6 @@
+use csv::ReaderBuilder;
 use serde::Serialize;
 use std::fs::File;
-use csv::ReaderBuilder;
 use tauri::Manager;
 
 #[derive(Serialize)]
@@ -24,8 +24,8 @@ pub struct GpuInfo {
 pub fn get_gpu_info() -> Vec<GpuInfo> {
     #[cfg(target_os = "windows")]
     {
-        use std::process::Command;
         use std::os::windows::process::CommandExt;
+        use std::process::Command;
 
         const CREATE_NO_WINDOW: u32 = 0x08000000;
 
@@ -66,11 +66,23 @@ pub fn get_gpu_info() -> Vec<GpuInfo> {
 #[cfg(target_os = "windows")]
 fn parse_gpu_value(v: &serde_json::Value) -> GpuInfo {
     let name = v["Name"].as_str().unwrap_or("Unknown").to_string();
-    let manufacturer = v["AdapterCompatibility"].as_str().unwrap_or("Unknown").to_string();
-    let video_processor = v["VideoProcessor"].as_str().unwrap_or("Unknown").to_string();
+    let manufacturer = v["AdapterCompatibility"]
+        .as_str()
+        .unwrap_or("Unknown")
+        .to_string();
+    let video_processor = v["VideoProcessor"]
+        .as_str()
+        .unwrap_or("Unknown")
+        .to_string();
     let driver_version = v["DriverVersion"].as_str().unwrap_or("Unknown").to_string();
-    let adapter_dac_type = v["AdapterDACType"].as_str().unwrap_or("Unknown").to_string();
-    let video_mode_description = v["VideoModeDescription"].as_str().unwrap_or("Unknown").to_string();
+    let adapter_dac_type = v["AdapterDACType"]
+        .as_str()
+        .unwrap_or("Unknown")
+        .to_string();
+    let video_mode_description = v["VideoModeDescription"]
+        .as_str()
+        .unwrap_or("Unknown")
+        .to_string();
 
     // DriverDate comes as "/Date(timestamp)/" format from PowerShell
     let driver_date = if let Some(date_str) = v["DriverDate"].as_str() {
@@ -153,7 +165,9 @@ pub struct GpuBenchmark {
 
 #[tauri::command]
 pub fn get_gpu_benchmark(app_handle: tauri::AppHandle, name: String) -> GpuBenchmark {
-    let csv_path = app_handle.path().resolve("resources/gpus.csv", tauri::path::BaseDirectory::Resource)
+    let csv_path = app_handle
+        .path()
+        .resolve("resources/gpus.csv", tauri::path::BaseDirectory::Resource)
         .unwrap_or_else(|_| "resources/gpus.csv".into());
 
     let file = match File::open(csv_path) {
@@ -163,7 +177,8 @@ pub fn get_gpu_benchmark(app_handle: tauri::AppHandle, name: String) -> GpuBench
 
     let mut rdr = ReaderBuilder::new().flexible(true).from_reader(file);
 
-    let search_name = name.to_lowercase()
+    let search_name = name
+        .to_lowercase()
         .replace("(tm)", "")
         .replace("(r)", "")
         .replace("(c)", "")

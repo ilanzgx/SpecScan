@@ -79,12 +79,12 @@ pub fn get_motherboard_info() -> MotherboardInfo {
 
                     memory_slots.push(MemorySlot {
                         slot_label: mem.device_locator().to_string(), // Ex: DIMM_A1, DIMM_A2, DIMM_B1, DIMM_B2
-                        bank_label: mem.bank_locator().to_string(), // Ex: BANK_A, P0 CHANNEL A
+                        bank_label: mem.bank_locator().to_string(),   // Ex: BANK_A, P0 CHANNEL A
                         manufacturer: mem.manufacturer().to_string(), // Ex: Samsung, Kingston, Corsair
                         serial_number: mem.serial_number().to_string(), // Ex: 123456789
-                        part_number: mem.part_number().to_string(), // Ex: 123456789
-                        size_mb, // Ex: 8192
-                        speed_mhz, // Ex: 2666
+                        part_number: mem.part_number().to_string(),   // Ex: 123456789
+                        size_mb,                                      // Ex: 8192
+                        speed_mhz,                                    // Ex: 2666
                         memory_type: format!("{:?}", mem.memory_type()), // Ex: DDR4
                         form_factor: format!("{:?}", mem.form_factor()), // Ex: DIMM
                         configured_voltage: format!("{:?}", mem.configured_voltage()), // Ex: 1.2V
@@ -96,12 +96,12 @@ pub fn get_motherboard_info() -> MotherboardInfo {
     }
 
     MotherboardInfo {
-        manufacturer, // Ex: Gigabyte, Asus, MSI
-        product, // Ex: B450M DS3H
-        version, // Ex: F1
+        manufacturer,  // Ex: Gigabyte, Asus, MSI
+        product,       // Ex: B450M DS3H
+        version,       // Ex: F1
         serial_number, // Ex: 123456789
-        asset_tag, // Ex: 123456789
-        bios, // Ex: BiosInfo
-        memory_slots, // Ex: Vec<MemorySlot>
+        asset_tag,     // Ex: 123456789
+        bios,          // Ex: BiosInfo
+        memory_slots,  // Ex: Vec<MemorySlot>
     }
 }

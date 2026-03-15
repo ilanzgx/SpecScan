@@ -35,8 +35,8 @@ pub fn get_memory_info() -> MemoryInfo {
 pub fn get_physical_memory_info() -> Vec<PhysicalMemorySlot> {
     #[cfg(target_os = "windows")]
     {
-        use std::process::Command;
         use std::os::windows::process::CommandExt;
+        use std::process::Command;
 
         const CREATE_NO_WINDOW: u32 = 0x08000000;
 
@@ -76,14 +76,26 @@ pub fn get_physical_memory_info() -> Vec<PhysicalMemorySlot> {
 
 #[cfg(target_os = "windows")]
 fn parse_ram_value(v: &serde_json::Value) -> PhysicalMemorySlot {
-    let manufacturer = v["Manufacturer"].as_str().unwrap_or("Unknown").trim().to_string();
-    let part_number = v["PartNumber"].as_str().unwrap_or("Unknown").trim().to_string();
+    let manufacturer = v["Manufacturer"]
+        .as_str()
+        .unwrap_or("Unknown")
+        .trim()
+        .to_string();
+    let part_number = v["PartNumber"]
+        .as_str()
+        .unwrap_or("Unknown")
+        .trim()
+        .to_string();
     let capacity = v["Capacity"].as_u64().unwrap_or(0);
     let speed_mhz = v["Speed"].as_u64().unwrap_or(0) as u32;
 
     // ConfiguredVoltage is given in millivolts
     let voltage_mv = v["ConfiguredVoltage"].as_u64().unwrap_or(0);
-    let configured_voltage = if voltage_mv > 0 { voltage_mv as f64 / 1000.0 } else { 0.0 };
+    let configured_voltage = if voltage_mv > 0 {
+        voltage_mv as f64 / 1000.0
+    } else {
+        0.0
+    };
 
     // SMBIOS Memory Type
     let smbios_mem_type = v["SMBIOSMemoryType"].as_u64().unwrap_or(0);
@@ -96,7 +108,8 @@ fn parse_ram_value(v: &serde_json::Value) -> PhysicalMemorySlot {
         34 => "DDR5",
         35 => "LPDDR5",
         _ => "Unknown",
-    }.to_string();
+    }
+    .to_string();
 
     let form_factor_code = v["FormFactor"].as_u64().unwrap_or(0);
     let form_factor = match form_factor_code {

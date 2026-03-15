@@ -1,5 +1,5 @@
 use serde::Serialize;
-use sysinfo::{Disks, DiskKind};
+use sysinfo::{DiskKind, Disks};
 
 #[derive(Serialize)]
 pub struct DiskInfo {
@@ -39,10 +39,10 @@ pub fn get_disks_info() -> Vec<DiskInfo> {
                     DiskKind::Unknown(v) => format!("Unknown({})", v),
                 },
                 file_system: disk.file_system().to_string_lossy().to_string(),
-                total_gb:        (total     / 1_073_741_824.0 * 100.0).round() / 100.0,
-                used_gb:         (used      / 1_073_741_824.0 * 100.0).round() / 100.0,
-                available_gb:    (available / 1_073_741_824.0 * 100.0).round() / 100.0,
-                usage_percent:   (usage_percent * 100.0).round() / 100.0,
+                total_gb: (total / 1_073_741_824.0 * 100.0).round() / 100.0,
+                used_gb: (used / 1_073_741_824.0 * 100.0).round() / 100.0,
+                available_gb: (available / 1_073_741_824.0 * 100.0).round() / 100.0,
+                usage_percent: (usage_percent * 100.0).round() / 100.0,
                 is_removable: disk.is_removable(),
             }
         })
@@ -60,8 +60,8 @@ pub struct PhysicalDiskInfo {
 pub fn get_physical_disks_info() -> Vec<PhysicalDiskInfo> {
     #[cfg(target_os = "windows")]
     {
-        use std::process::Command;
         use std::os::windows::process::CommandExt;
+        use std::process::Command;
 
         const CREATE_NO_WINDOW: u32 = 0x08000000;
 
@@ -102,7 +102,11 @@ pub fn get_physical_disks_info() -> Vec<PhysicalDiskInfo> {
 #[cfg(target_os = "windows")]
 fn parse_disk_value(v: &serde_json::Value) -> PhysicalDiskInfo {
     let model = v["Model"].as_str().unwrap_or("Unknown").to_string();
-    let serial = v["SerialNumber"].as_str().unwrap_or("Unknown").trim().to_string();
+    let serial = v["SerialNumber"]
+        .as_str()
+        .unwrap_or("Unknown")
+        .trim()
+        .to_string();
     let size = v["Size"].as_u64().unwrap_or(0);
 
     PhysicalDiskInfo {

@@ -26,13 +26,11 @@ pub fn get_network_info() -> Vec<NetworkInfo> {
 
     networks
         .iter()
-        .map(|(name, data)| {
-            NetworkInfo {
-                interface_name: name.clone(),
-                received_bytes: data.total_received(),
-                transmitted_bytes: data.total_transmitted(),
-                mac_address: data.mac_address().to_string(),
-            }
+        .map(|(name, data)| NetworkInfo {
+            interface_name: name.clone(),
+            received_bytes: data.total_received(),
+            transmitted_bytes: data.total_transmitted(),
+            mac_address: data.mac_address().to_string(),
         })
         .collect()
 }
@@ -42,8 +40,8 @@ pub fn get_network_info() -> Vec<NetworkInfo> {
 pub fn get_network_adapters_info() -> Vec<NetworkAdapterInfo> {
     #[cfg(target_os = "windows")]
     {
-        use std::process::Command;
         use std::os::windows::process::CommandExt;
+        use std::process::Command;
 
         const CREATE_NO_WINDOW: u32 = 0x08000000;
 

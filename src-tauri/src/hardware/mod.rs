@@ -1,7 +1,7 @@
 pub mod cpu;
-pub mod motherboard;
-pub mod memory;
 pub mod disks;
+pub mod gpu;
+pub mod memory;
+pub mod motherboard;
 pub mod network;
 pub mod system;
-pub mod gpu;
