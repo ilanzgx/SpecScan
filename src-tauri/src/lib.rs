@@ -47,8 +47,15 @@ pub fn run() {
             .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
             #[cfg(target_os = "windows")]
-            window_vibrancy::apply_blur(&window, Some((18, 18, 18, 225)))
-                .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+            {
+                // mica effect for windows 11
+                let mica_result = window_vibrancy::apply_mica(&window, Some(true));
+
+                // fallback to blur for windows 10
+                if mica_result.is_err() {
+                    let _ = window_vibrancy::apply_blur(&window, Some((18, 18, 18, 225)));
+                }
+            }
 
             /*#[cfg(target_os = "linux")] {
               // No native blur from window-vibrancy on Linux
