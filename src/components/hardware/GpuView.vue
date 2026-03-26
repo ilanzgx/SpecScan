@@ -10,12 +10,9 @@ defineProps<{
   <div class="p-4">
     <h2 class="text-2xl font-bold mb-4">Placa de Vídeo / GPU</h2>
     <div v-if="gpus && gpus.length > 0" class="space-y-6">
-      <div
-        v-for="(gpu, i) in gpus"
-        :key="gpu.name"
-        class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl"
-      >
-        <h3 class="text-xl font-bold mb-2">GPU {{ i + 1 }}: {{ gpu.name }}</h3>
+      <div v-for="(gpu, i) in gpus" :key="gpu.name" class="space-y-4">
+        <div class="bg-white/5 backdrop-blur-xl shadow-2xl p-4 rounded-xl">
+          <h3 class="text-xl font-bold mb-2">GPU {{ i + 1 }}: {{ gpu.name }}</h3>
         <ul class="space-y-1">
           <li><strong>Fabricante:</strong> {{ gpu.manufacturer }}</li>
           <li>
@@ -38,6 +35,7 @@ defineProps<{
             <strong>Profundidade de Cor:</strong> {{ gpu.bits_per_pixel }} bpp
           </li>
         </ul>
+        </div>
 
         <div
           v-if="
@@ -45,7 +43,7 @@ defineProps<{
             gpu.benchmark.ranking !== 'N/A' &&
             gpu.benchmark.ranking
           "
-          class="mt-4 bg-cyan-500/10 border border-cyan-500/20 p-4 rounded-xl"
+          class="bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-xl shadow-2xl p-4 rounded-xl"
         >
           <h4
             class="font-semibold text-lg mb-4 border-b border-cyan-500/30 pb-2 text-cyan-400"

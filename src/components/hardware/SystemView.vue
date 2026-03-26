@@ -293,12 +293,7 @@ const downloadSummaryImage = async () => {
             </p>
             <p v-if="gpu?.benchmark?.release_date" class="text-xs px-4 py-0.5">
               <span class="text-[13px] text-white/50">
-                Data de Lançamento: {{ gpu.benchmark.release_date }} | TDP:
-                {{
-                  gpu.benchmark.tdp !== "NA" ? gpu.benchmark.tdp + "W" : "N/A"
-                }}
-                | Memória: {{ gpu.benchmark.vram }} | Preço Est.:
-                {{ gpu.benchmark.price !== "NA" ? gpu.benchmark.price : "N/A" }}
+                Data de Lançamento: {{ gpu.benchmark.release_date }}
               </span>
             </p>
           </div>
